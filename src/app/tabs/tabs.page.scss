@@ -1,0 +1,76 @@
+/* Estilos base del navbar para que coincida con el diseño oscuro de la app */
+.hero-tabs {
+  --background: #1a1f2b;
+  height: 60px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Estilo de los botones de navegación */
+.tab-button {
+  --color: rgba(255, 255, 255, 0.5);
+  --color-selected: #4d92ff;
+}
+
+.tab-button ion-icon {
+  font-size: 24px;
+}
+
+.tab-button ion-label {
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* Estilo especial para la pestaña Héroes */
+.heroes-fab {
+  bottom: 10px;
+}
+
+.heroes-fab ion-fab-button {
+  --background: #4d92ff;
+  --background-activated: #3a7de0;
+  --background-hover: #60a0ff;
+  --box-shadow: 0 4px 12px rgba(77, 146, 255, 0.4);
+  --color: white;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 10px;
+}
+
+.tab-heroes {
+  position: relative;
+}
+
+.tab-heroes ion-label {
+  position: absolute;
+  bottom: 5px;
+  color: #4d92ff;
+}
+
+.fab-container {
+  height: 46px;
+  position: relative;
+}
+
+/* Aseguramos compatibilidad con safe areas */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .hero-tabs {
+    padding-bottom: env(safe-area-inset-bottom);
+    height: calc(60px + env(safe-area-inset-bottom));
+  }
+  
+  .tab-heroes ion-label {
+    bottom: calc(5px + env(safe-area-inset-bottom)/2);
+  }
+}
+
+/* Efecto para tab seleccionado */
+.tab-button.tab-selected {
+  --color-selected: #4d92ff;
+}
+
+/* Ajuste específico para el botón flotante en la pestaña activa */
+.tab-button.tab-selected.tab-heroes .heroes-fab ion-fab-button {
+  --background: #60a0ff;
+  transform: translateY(-5px);
+  transition: transform 0.2s ease;
+}

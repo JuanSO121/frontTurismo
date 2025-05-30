@@ -1,0 +1,57 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Iniciar Sesión</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="login-container">
+    <div class="logo-container">
+      <ion-icon name="people-circle-outline" class="logo-icon"></ion-icon>
+      <h2>Heroes App</h2>
+    </div>
+    
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <ion-card>
+        <ion-card-content>
+          <!-- Email input -->
+          <ion-item>
+            <ion-label position="floating">Email</ion-label>
+            <ion-input type="email" formControlName="email"></ion-input>
+          </ion-item>
+          <div class="validation-error" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+            <span *ngIf="loginForm.get('email')?.errors?.['required']">Email es requerido</span>
+            <span *ngIf="loginForm.get('email')?.errors?.['email']">Formato de email inválido</span>
+          </div>
+          
+          <!-- Password input -->
+          <ion-item>
+            <ion-label position="floating">Contraseña</ion-label>
+            <ion-input type="password" formControlName="password"></ion-input>
+          </ion-item>
+          <div class="validation-error" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+            <span *ngIf="loginForm.get('password')?.errors?.['required']">Contraseña es requerida</span>
+            <span *ngIf="loginForm.get('password')?.errors?.['minlength']">La contraseña debe tener al menos 6 caracteres</span>
+          </div>
+          
+          <!-- Error message -->
+          <div class="error-message" *ngIf="errorMessage">
+            <ion-text color="danger">{{ errorMessage }}</ion-text>
+          </div>
+          
+          <!-- Login button -->
+          <ion-button expand="block" type="submit" [disabled]="loginForm.invalid || loading" class="login-button">
+            <ion-spinner name="crescent" *ngIf="loading"></ion-spinner>
+            <span *ngIf="!loading">Iniciar Sesión</span>
+          </ion-button>
+          
+          <!-- Register link -->
+          <div class="register-link">
+            <ion-text>¿No tienes cuenta?</ion-text>
+            <ion-button fill="clear" (click)="navigateToRegister()">Regístrate</ion-button>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </form>
+  </div>
+</ion-content>

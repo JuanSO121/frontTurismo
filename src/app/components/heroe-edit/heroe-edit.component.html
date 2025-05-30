@@ -1,0 +1,81 @@
+@if (heroe) {
+  <!-- Vista de detalle de héroe -->
+  @if (accion === 'visualizar') {
+  <div class="hero-detail-container">
+    <ion-card class="hero-card">
+      <div class="hero-image-container">
+        <img alt="Foto del Héroe" src="{{ heroe.img }}" class="hero-image" />
+        <div class="hero-house-badge {{ heroe.casa }}">
+          {{ heroe.casa }}
+        </div>
+      </div>
+      
+      <ion-card-header>
+        <ion-card-title class="hero-title">{{ heroe.nombre }}</ion-card-title>
+        <ion-card-subtitle>Primera aparición: {{ heroe.aparicion }}</ion-card-subtitle>
+      </ion-card-header>
+    
+      <ion-card-content class="hero-bio">
+        <p>{{ heroe.bio }}</p>
+      </ion-card-content>
+    </ion-card>
+  </div>
+  }
+  
+  <!-- Formulario de edición/creación -->
+  @if (accion !== 'visualizar') {
+  <div class="hero-form-container">
+    <form #form="ngForm" (ngSubmit)="guardar()">
+      <ion-item lines="none" class="form-id">
+        <ion-label position="stacked">ID</ion-label>
+        <ion-input [(ngModel)]="heroe._id" name="_id" disabled fill="outline"></ion-input>
+      </ion-item>
+    
+      <ion-item lines="none" class="form-item">
+        <ion-label position="stacked">Nombre del Héroe</ion-label>
+        <ion-input [(ngModel)]="heroe.nombre" name="nombre" required fill="outline" 
+                  placeholder="Introduce el nombre del héroe"></ion-input>
+      </ion-item>
+    
+      <ion-item lines="none" class="form-item">
+        <ion-label position="stacked">Biografía</ion-label>
+        <ion-textarea [(ngModel)]="heroe.bio" name="bio" required fill="outline"
+                    placeholder="Describe la historia del héroe" autoGrow="true" rows="4"></ion-textarea>
+      </ion-item>
+    
+      <ion-item lines="none" class="form-item">
+        <ion-label position="stacked">URL de la Imagen</ion-label>
+        <div class="img-input-container">
+          <ion-thumbnail class="hero-thumbnail">
+            <ion-img alt="Imagen del héroe" src="{{ heroe.img || 'assets/placeholder-hero.jpg' }}" />
+          </ion-thumbnail>
+          <ion-input [(ngModel)]="heroe.img" name="img" required fill="outline"
+                    placeholder="https://ejemplo.com/imagen.jpg"></ion-input>
+        </div>
+      </ion-item>
+    
+      <ion-item lines="none" class="form-item">
+        <ion-label position="stacked">Primera Aparición</ion-label>
+        <ion-input [(ngModel)]="heroe.aparicion" name="aparicion" fill="outline"
+                  placeholder="Ejemplo: 1962"></ion-input>
+      </ion-item>
+    
+      <ion-item lines="none" class="form-item">
+        <ion-label position="stacked">Casa</ion-label>
+        <ion-select [(ngModel)]="heroe.casa" name="casa" interface="action-sheet" fill="outline">
+          <ion-select-option value="Marvel">Marvel</ion-select-option>
+          <ion-select-option value="DC">DC</ion-select-option>
+          <ion-select-option value="Otro">Otro</ion-select-option>
+        </ion-select>
+      </ion-item>
+    
+      <div class="form-actions">
+        <ion-button expand="block" type="submit" [disabled]="form.invalid" shape="round" class="save-button">
+          <ion-icon name="save-outline" slot="start"></ion-icon>
+          Guardar Héroe
+        </ion-button>
+      </div>
+    </form>
+  </div>
+  }
+}

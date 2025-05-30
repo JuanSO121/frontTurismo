@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">ToBeHero</string>
+    <string name="title_activity_main">ToBeHero</string>
+    <string name="package_name">com.TobeHero.miapp</string>
+    <string name="custom_url_scheme">com.TobeHero.miapp</string>
+</resources>

@@ -1,0 +1,228 @@
+/* Estilos para la página de héroes */
+
+/* Estilos para las tarjetas de héroes */
+.hero-card {
+  margin-bottom: 16px;
+  transition: transform 0.2s ease;
+  cursor: pointer;
+  overflow: hidden;
+  
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+/* Contenedor de imagen de héroe */
+.hero-image-container {
+  position: relative;
+  height: 180px;
+  overflow: hidden;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+/* Badge de la casa (Marvel/DC) */
+.hero-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background-color: var(--ion-color-primary);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  
+  &.detail {
+    top: 16px;
+    right: 16px;
+    font-size: 14px;
+    padding: 6px 12px;
+  }
+}
+
+/* Detalles de héroe en la tarjeta */
+.hero-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+}
+
+/* Detalle individual */
+.hero-detail {
+  display: flex;
+  align-items: center;
+  color: var(--ion-color-medium);
+  font-size: 14px;
+  
+  ion-icon {
+    margin-right: 6px;
+  }
+}
+
+/* Acciones del héroe */
+.hero-actions {
+  display: flex;
+  
+  ion-button {
+    margin-left: 8px;
+  }
+}
+
+/* Contenedor de carga */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  
+  p {
+    margin-top: 16px;
+    color: var(--ion-color-medium);
+  }
+}
+
+/* Estado vacío */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  text-align: center;
+  padding: 0 16px;
+  
+  ion-icon {
+    font-size: 64px;
+    color: var(--ion-color-medium);
+    margin-bottom: 16px;
+  }
+  
+  h2 {
+    font-size: 20px;
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+  
+  p {
+    color: var(--ion-color-medium);
+    margin-top: 0;
+  }
+}
+
+/* Contenido detallado del héroe */
+.hero-detail-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Imagen detallada del héroe */
+.hero-image-detail {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  
+  img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+  }
+}
+
+/* Sección de información del héroe */
+.hero-info-section {
+  h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--ion-color-dark);
+  }
+}
+
+/* Ítem de información */
+.info-item {
+  margin-bottom: 16px;
+  
+  ion-label {
+    font-weight: 600;
+    color: var(--ion-color-medium);
+    margin-bottom: 4px;
+    display: block;
+  }
+  
+  p {
+    margin: 0;
+    color: var(--ion-color-dark);
+    line-height: 1.5;
+  }
+  
+  &.biography p {
+    margin-bottom: 16px;
+    white-space: pre-line;
+  }
+}
+
+/* Botones de acción */
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+/* Contenedor del formulario */
+.form-container {
+  padding: 16px 0;
+  
+  ion-button {
+    margin-top: 24px;
+  }
+}
+
+/* Contenedor de vista previa de imagen */
+.preview-container {
+  margin-top: 16px;
+  
+  p {
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+  
+  img {
+    width: 100%;
+    max-height: 200px;
+    object-fit: contain;
+    border: 1px solid var(--ion-color-light);
+    border-radius: 8px;
+  }
+}
+
+/* Contenedor de notas */
+.note-container {
+  margin-top: 16px;
+  padding: 12px;
+  background-color: var(--ion-color-light);
+  border-radius: 8px;
+  
+  p {
+    margin: 0;
+    color: var(--ion-color-medium);
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    
+    ion-icon {
+      margin-right: 8px;
+      font-size: 18px;
+    }
+  }
+}

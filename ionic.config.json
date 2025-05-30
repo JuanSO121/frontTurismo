@@ -1,0 +1,7 @@
+{
+  "name": "appCrud",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}

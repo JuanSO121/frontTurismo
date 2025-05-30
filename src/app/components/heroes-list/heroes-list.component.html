@@ -1,0 +1,152 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>{{ titulo }}</ion-title>
+    <!-- Botón de cerrar sesión cuando está autenticado -->
+    <ion-buttons slot="end" *ngIf="isAuthenticated">
+      <ion-button (click)="logout()">
+        <ion-icon slot="icon-only" name="logOutOutline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="heroes-container">
+    <!-- Loading indicator -->
+    @if (isLoading) {
+    <div class="loading-container">
+      <ion-spinner name="circles"></ion-spinner>
+      <p>Cargando héroes...</p>
+    </div>
+    }
+    
+    <!-- Error message -->
+    @if (errorMessage) {
+    <div class="error-container">
+      <ion-icon name="alertCircleOutline" color="danger"></ion-icon>
+      <p>{{ errorMessage }}</p>
+      <ion-button (click)="loadHeroes()">Reintentar</ion-button>
+    </div>
+    }
+    
+    <!-- Cabecera con título y botón de creación -->
+    <div class="heroes-header">
+      <div class="header-titles">
+        <h1>{{ titulo }}</h1>
+        <p class="subtitle">{{ subtitulo }}</p>
+      </div>
+          
+      <ion-button color="primary" (click)="crearHeroe()" class="create-button" shape="round">
+        <ion-icon name="add" slot="start"></ion-icon>
+        Nuevo Héroe
+      </ion-button>
+    </div>
+    
+    <!-- Lista de héroes -->
+    <div class="heroes-list-container">
+      @for (heroe of heroes; track heroe._id || $index; let i = $index) {
+      <ion-card class="hero-card" (click)="verHeroe(heroe._id)">
+        <div class="hero-content">
+          <ion-avatar class="hero-avatar">
+            <img [src]="getHeroMainImage(heroe)" alt="Imagen de {{ heroe.nombre }}" />
+          </ion-avatar>
+                  
+          <div class="hero-info">
+            <h2 class="hero-name">{{ heroe.nombre }}</h2>
+            <p class="hero-house {{ heroe.casa}}">{{ heroe.casa }}</p>
+            <p class="hero-date">{{ heroe.aparicion | date:'dd/MM/yyyy' }}</p>
+          </div>
+                  
+          <div class="hero-actions">
+            <ion-button fill="clear" (click)="editarHeroe(heroe._id); $event.stopPropagation()">
+              <ion-icon slot="icon-only" name="createOutline" color="primary"></ion-icon>
+            </ion-button>
+                      
+            <ion-button fill="clear" (click)="mostrarConfirmacionEliminar(heroe); $event.stopPropagation()">
+              <ion-icon slot="icon-only" name="trashOutline" color="danger"></ion-icon>
+            </ion-button>
+          </div>
+        </div>
+      </ion-card>
+      }
+      
+      <!-- Estado vacío (solo se muestra cuando no hay héroes y no está cargando) -->
+      @if (heroes.length === 0 && !isLoading && !errorMessage) {
+      <div class="empty-state">
+        <ion-icon name="sadOutline" class="empty-icon"></ion-icon>
+        <h2>No hay héroes disponibles</h2>
+        <p>Crea un nuevo héroe para comenzar</p>
+        <ion-button color="primary" (click)="crearHeroe()">
+          <ion-icon name="add" slot="start"></ion-icon>
+          Crear mi primer héroe
+        </ion-button>
+      </div>
+      }
+      
+      <!-- Notificación cuando no está autenticado -->
+      @if (!isAuthenticated && !isLoading) {
+      <div class="auth-notification">
+        <ion-icon name="alertCircleOutline"></ion-icon>
+        <p>Necesitas iniciar sesión para crear, editar o eliminar héroes</p>
+        <ion-button color="primary" routerLink="/tabs/login">
+          Iniciar sesión
+        </ion-button>
+      </div>
+      }
+    </div>
+    
+    <!-- Botón flotante para crear héroe (solo visible en móvil y cuando está autenticado) -->
+    <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="fab-mobile" *ngIf="isAuthenticated">
+      <ion-fab-button (click)="crearHeroe()">
+        <ion-icon name="add"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
+  </div>
+  
+  <!-- Toast para mensajes -->
+  <ion-toast
+    [isOpen]="isToastOpen"
+    [message]="toastMessage"
+    [duration]="3000"
+    [position]="'bottom'"
+    (didDismiss)="setToastOpen(false)"
+  ></ion-toast>
+</ion-content>
+
+<!-- Modal para crear/editar héroe -->
+<ion-modal [isOpen]="isModalOpen" [backdropDismiss]="false" [initialBreakpoint]="0.95" [breakpoints]="[0, 0.95]" class="hero-modal">
+  <ng-template>
+    <ion-header class="ion-no-border">
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-button (click)="cancel()">
+            <ion-icon slot="icon-only" name="closeOutline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+        <ion-title>
+          @if (accion === 'visualizar') {
+            Detalles del Héroe
+          } @else if (accion === 'editar') {
+            Editar Héroe
+          } @else {
+            Nuevo Héroe
+          }
+        </ion-title>
+        <ion-buttons slot="end">
+          @if (accion !== 'visualizar') {
+          <ion-button (click)="confirm()" [strong]="true" color="primary">Guardar</ion-button>
+          }
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+      
+    <ion-content class="modal-content">
+      <app-heroe-edit
+        [heroe]="heroe"
+        [accion]="accion"
+        (heroeCambiado)="recargarHeroesModal($event)"
+      ></app-heroe-edit>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+

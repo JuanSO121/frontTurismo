@@ -1,0 +1,257 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Administrar Héroes
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <!-- Refresh Control -->
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  
+  <!-- Barra de búsqueda -->
+  <ion-searchbar
+    [debounce]="500"
+    [(ngModel)]="searchTerm"
+    (ionInput)="filterHeroes()"
+    placeholder="Buscar héroe...">
+  </ion-searchbar>
+  
+  <!-- Spinner de carga -->
+  <div class="loading-container" *ngIf="loading">
+    <ion-spinner name="circular"></ion-spinner>
+    <p>Cargando héroes...</p>
+  </div>
+  
+  <!-- Mensaje de error -->
+  <ion-card *ngIf="error && !loading">
+    <ion-card-header>
+      <ion-card-title>Error</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      {{ errorMessage }}
+      <ion-button expand="block" color="primary" (click)="loadHeroes()">
+        Reintentar
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+  
+  <!-- Lista de héroes -->
+  <ion-grid *ngIf="!loading && !error">
+    <ion-row>
+      <ion-col size="12" size-md="6" size-lg="4" *ngFor="let hero of filteredHeroes">
+        <ion-card (click)="viewHeroDetails(hero)" class="hero-card">
+          <div class="hero-image-container">
+            <img 
+              [src]="getHeroImage(hero)" 
+              (error)="handleImageError($event)"
+              alt="{{ hero.nombre }}"
+            />
+            <div class="hero-badge">{{ hero.casa }}</div>
+          </div>
+          <ion-card-header>
+            <ion-card-title>{{ hero.nombre }}</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="hero-details">
+              <div class="hero-detail">
+                <ion-icon name="timer-outline"></ion-icon>
+                <span>{{ hero.aparicion }}</span>
+              </div>
+              <div class="hero-actions">
+                <ion-button fill="clear" color="primary" (click)="$event.stopPropagation(); editHero(hero)">
+                  <ion-icon name="create-outline"></ion-icon>
+                </ion-button>
+                <ion-button fill="clear" color="danger" (click)="$event.stopPropagation(); deleteHero(hero)">
+                  <ion-icon name="trash-outline"></ion-icon>
+                </ion-button>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  
+  <!-- Mensaje si no hay héroes -->
+  <div class="empty-state" *ngIf="!loading && !error && filteredHeroes.length === 0">
+    <ion-icon name="home-outline" size="large"></ion-icon>
+    <h2>No se encontraron héroes</h2>
+    <p>Intenta con una búsqueda diferente o añade nuevos héroes con el botón +</p>
+  </div>
+  
+  <!-- Botón flotante para añadir héroe -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="openNewHeroModal()">
+      <ion-icon name="add-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+  
+  <!-- Modal para ver detalles del héroe -->
+  <ion-modal #heroModal trigger="open-hero-modal" [presentingElement]="$event">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>{{ selectedHero?.nombre }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeHeroModal()">
+              <ion-icon name="close-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding" *ngIf="selectedHero">
+        <div class="hero-detail-content">
+          <div class="hero-image-detail">
+            <img 
+              [src]="getHeroImage(selectedHero)" 
+              (error)="handleImageError($event)"
+              alt="{{ selectedHero.nombre }}"
+            />
+            <div class="hero-badge detail">{{ selectedHero.casa }}</div>
+          </div>
+          
+          <div class="hero-info-section">
+            <h2>{{ selectedHero.nombre }}</h2>
+            
+            <div class="info-item">
+              <ion-label>Primera aparición:</ion-label>
+              <p>{{ selectedHero.aparicion }}</p>
+            </div>
+            
+            <div class="info-item biography">
+              <ion-label>Biografía:</ion-label>
+              <p>{{ selectedHero.bio }}</p>
+            </div>
+            
+            <div class="info-item">
+              <ion-label>Imágenes:</ion-label>
+              <p>{{ Array.isArray(selectedHero.img) ? selectedHero.img.length : (selectedHero.img ? 1 : 0) }}</p>
+            </div>
+          </div>
+          
+          <div class="action-buttons">
+            <ion-button expand="block" color="primary" (click)="editHero(selectedHero)">
+              <ion-icon name="create-outline" slot="start"></ion-icon>
+              Editar
+            </ion-button>
+            
+            <ion-button expand="block" color="secondary" (click)="viewHeroGallery()">
+              <ion-icon name="image-outline" slot="start"></ion-icon>
+              Ver Galería
+            </ion-button>
+            
+            <ion-button expand="block" color="danger" (click)="deleteHero(selectedHero)">
+              <ion-icon name="trash-outline" slot="start"></ion-icon>
+              Eliminar
+            </ion-button>
+          </div>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+  
+  <!-- Modal para crear/editar héroe -->
+  <ion-modal #editModal trigger="open-edit-modal" [presentingElement]="$event">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>{{ isEditMode ? 'Editar Héroe' : 'Nuevo Héroe' }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cancelEdit()">
+              <ion-icon name="close-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <div class="form-container">
+          <!-- Nombre -->
+          <ion-item>
+            <ion-input
+              label="Nombre"
+              labelPlacement="floating"
+              [(ngModel)]="newHero.nombre"
+              required
+              placeholder="Ej. Spider-Man">
+            </ion-input>
+          </ion-item>
+          
+          <!-- Casa (Marvel/DC) -->
+          <ion-item>
+            <ion-select
+              label="Casa"
+              labelPlacement="floating"
+              [(ngModel)]="newHero.casa"
+              placeholder="Selecciona una casa">
+              <ion-select-option *ngFor="let casa of casas" [value]="casa">{{ casa }}</ion-select-option>
+            </ion-select>
+          </ion-item>
+          
+          <!-- Primera aparición -->
+          <ion-item>
+            <ion-input
+              label="Primera aparición"
+              labelPlacement="floating"
+              [(ngModel)]="newHero.aparicion"
+              required
+              placeholder="Ej. 1962">
+            </ion-input>
+          </ion-item>
+          
+          <!-- Biografía -->
+          <ion-item>
+            <ion-textarea
+              label="Biografía"
+              labelPlacement="floating"
+              [(ngModel)]="newHero.bio"
+              rows="4"
+              required
+              placeholder="Escribe una breve biografía del héroe...">
+            </ion-textarea>
+          </ion-item>
+          
+          <!-- URL de imagen principal -->
+          <ion-item>
+            <ion-input
+              label="URL de imagen principal"
+              labelPlacement="floating"
+              [(ngModel)]="newHero.img"
+              placeholder="https://ejemplo.com/imagen.jpg">
+            </ion-input>
+          </ion-item>
+          
+          <!-- Vista previa de la imagen -->
+          <div class="preview-container" *ngIf="newHero.img">
+            <p>Vista previa:</p>
+            <img 
+              [src]="newHero.img" 
+              (error)="handleImageError($event)" 
+              alt="Vista previa"
+            />
+          </div>
+          
+          <!-- Nota sobre la galería -->
+          <div class="note-container">
+            <p>
+              <ion-icon name="information-circle-outline"></ion-icon>
+              Para gestionar todas las imágenes, usa la sección de Galería una vez creado el héroe.
+            </p>
+          </div>
+          
+          <!-- Botón de guardar -->
+          <ion-button 
+            expand="block" 
+            (click)="saveHero()" 
+            [disabled]="processingAction">
+            <ion-icon name="save-outline" slot="start"></ion-icon>
+            {{ isEditMode ? 'Actualizar Héroe' : 'Crear Héroe' }}
+          </ion-button>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>
