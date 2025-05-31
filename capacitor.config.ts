@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.TobeHero.miapp',
-  appName: 'ToBeHero',
+  appId: 'com.ciudades.app',
+  appName: 'ciudades',
   webDir: 'www'
 };
 

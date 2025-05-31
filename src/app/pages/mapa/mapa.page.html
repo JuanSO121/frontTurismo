@@ -1,0 +1,30 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/visita"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Ubicación de la Visita</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- Mostrar coordenadas (igual que el componente que funciona) -->
+  <div *ngIf="lat && lon" class="coordinates">
+    <p><strong>Ubicación:</strong> Latitud: {{ lat }}, Longitud: {{ lon }}</p>
+  </div>
+
+  <!-- Mensaje de error si no hay coordenadas -->
+  <div *ngIf="!lat || !lon" class="error-message">
+    <ion-card color="danger">
+      <ion-card-header>
+        <ion-card-title>❌ Sin coordenadas</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        No se recibieron coordenadas válidas para mostrar la ubicación en el mapa.
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Contenedor del mapa (estructura simple como el que funciona) -->
+  <div id="map"></div>
+</ion-content>

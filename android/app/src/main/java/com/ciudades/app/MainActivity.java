@@ -1,4 +1,4 @@
-package com.TobeHero.miapp;
+package com.ciudades.app;
 
 import com.getcapacitor.BridgeActivity;
 

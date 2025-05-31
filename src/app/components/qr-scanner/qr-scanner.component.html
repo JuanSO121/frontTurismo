@@ -1,0 +1,8 @@
+<ion-button 
+  expand="block" 
+  (click)="scan()" 
+  [disabled]="isScanning"
+  fill="outline">
+  <ion-icon name="camera-outline" slot="start"></ion-icon>
+  {{ isScanning ? 'Escaneando...' : 'Escanear Código QR' }}
+</ion-button>
