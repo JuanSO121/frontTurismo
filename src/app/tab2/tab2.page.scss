@@ -1,0 +1,500 @@
+// Estilos para la página de favoritos
+.title-icon {
+  margin-right: 8px;
+  font-size: 1.2em;
+}
+
+// Tarjeta de estadísticas
+.stats-card {
+  margin: 16px;
+  margin-bottom: 8px;
+  
+  .stats-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 8px 0;
+    
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      
+      .stat-badge {
+        font-size: 1.2em;
+        font-weight: bold;
+        padding: 8px 12px;
+      }
+      
+      .stat-label {
+        font-size: 0.9em;
+        color: var(--ion-color-medium);
+        text-align: center;
+      }
+    }
+  }
+}
+
+// Controles
+.controls-card {
+  margin: 8px 16px;
+  
+  .controls-row {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+    
+    @media (min-width: 768px) {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      
+      ion-segment {
+        max-width: 200px;
+      }
+      
+      .sort-segment {
+        max-width: 300px;
+      }
+    }
+  }
+  
+  .clear-button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 16px;
+  }
+}
+
+// Vista de cuadrícula
+.favorite-col {
+  padding: 8px;
+}
+
+.favorite-grid-item {
+  background: var(--ion-color-light);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  }
+  
+  .image-container {
+    position: relative;
+    width: 100%;
+    height: 150px;
+    overflow: hidden;
+    
+    .favorite-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+    
+    .image-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.1) 0%,
+        rgba(0, 0, 0, 0) 30%,
+        rgba(0, 0, 0, 0) 70%,
+        rgba(0, 0, 0, 0.3) 100%
+      );
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 8px;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      
+      .image-info {
+        color: white;
+        font-size: 1.2em;
+      }
+      
+      .image-actions {
+        display: flex;
+        gap: 4px;
+      }
+    }
+    
+    &:hover {
+      .favorite-image {
+        transform: scale(1.05);
+      }
+      
+      .image-overlay {
+        opacity: 1;
+      }
+    }
+  }
+  
+  .favorite-info {
+    padding: 12px;
+    
+    .hero-name {
+      margin: 0 0 4px 0;
+      font-size: 1em;
+      font-weight: 600;
+      color: var(--ion-color-dark);
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    
+    .date-added {
+      margin: 0;
+      font-size: 0.8em;
+      color: var(--ion-color-medium);
+    }
+  }
+}
+
+// Vista de lista
+.list-item-content {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 12px;
+  padding: 8px 0;
+  
+  .list-image-container {
+    flex-shrink: 0;
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    overflow: hidden;
+    
+    .list-favorite-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+  
+  .list-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    
+    .list-hero-name {
+      margin: 0;
+      font-size: 1.1em;
+      font-weight: 600;
+      color: var(--ion-color-dark);
+    }
+    
+    .list-date {
+      margin: 0;
+      font-size: 0.9em;
+      color: var(--ion-color-medium);
+    }
+    
+    .image-index-chip {
+      align-self: flex-start;
+      font-size: 0.8em;
+    }
+  }
+  
+  .list-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    
+    ion-button {
+      --padding-start: 8px;
+      --padding-end: 8px;
+      height: 32px;
+    }
+  }
+}
+
+// Estado vacío y sin resultados
+.empty-state {
+  margin: 16px;
+  
+  .empty-icon {
+    font-size: 4em;
+    margin-bottom: 16px;
+  }
+  
+  h2 {
+    color: var(--ion-color-dark);
+    margin-bottom: 12px;
+  }
+  
+  p {
+    color: var(--ion-color-medium);
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+  
+  .explore-button {
+    margin-top: 8px;
+  }
+}
+
+.no-results {
+  text-align: center;
+  padding: 40px 20px;
+  
+  ion-icon {
+    font-size: 3em;
+    margin-bottom: 16px;
+  }
+  
+  p {
+    color: var(--ion-color-medium);
+    font-size: 1em;
+    line-height: 1.4;
+  }
+}
+
+// Modal
+.modal-content {
+  --background: var(--ion-color-dark);
+}
+
+.modal-image-container {
+  position: relative;
+  width: 100%;
+  height: 60vh;
+  overflow: hidden;
+  
+  .modal-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: var(--ion-color-dark);
+  }
+  
+  .modal-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.8) 0%,
+      rgba(0, 0, 0, 0.4) 50%,
+      rgba(0, 0, 0, 0) 100%
+    );
+    padding: 20px;
+    
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      
+      ion-button {
+        --border-radius: 20px;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+.modal-info {
+  background: var(--ion-color-light);
+  color: var(--ion-color-dark);
+  padding: 24px;
+  
+  .modal-header {
+    margin-bottom: 24px;
+    
+    h1 {
+      margin: 0 0 12px 0;
+      font-size: 1.8em;
+      font-weight: 700;
+      color: var(--ion-color-primary);
+    }
+    
+    .modal-badges {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+  }
+  
+  .modal-details {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    
+    .detail-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      
+      ion-icon {
+        font-size: 1.2em;
+        flex-shrink: 0;
+      }
+      
+      .detail-content {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        
+        .detail-label {
+          font-size: 0.9em;
+          color: var(--ion-color-medium);
+          font-weight: 500;
+        }
+        
+        .detail-value {
+          font-size: 1em;
+          color: var(--ion-color-dark);
+          font-weight: 600;
+        }
+      }
+    }
+  }
+}
+
+// Responsividad
+@media (max-width: 767px) {
+  .stats-card {
+    .stats-container {
+      .stat-item {
+        .stat-badge {
+          font-size: 1em;
+          padding: 6px 10px;
+        }
+        
+        .stat-label {
+          font-size: 0.8em;
+        }
+      }
+    }
+  }
+  
+  .favorite-grid-item {
+    .image-container {
+      height: 120px;
+    }
+    
+    .favorite-info {
+      padding: 8px;
+      
+      .hero-name {
+        font-size: 0.9em;
+      }
+      
+      .date-added {
+        font-size: 0.75em;
+      }
+    }
+  }
+  
+  .modal-actions {
+    flex-direction: column;
+    
+    ion-button {
+      width: 100%;
+    }
+  }
+}
+
+// Animaciones
+@keyframes slideInUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.favorite-grid-item,
+.list-item-content {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.modal-info {
+  animation: slideInUp 0.4s ease-out;
+}
+
+// Loading states
+.loading-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--ion-color-light) 0%,
+    var(--ion-color-light-shade) 50%,
+    var(--ion-color-light) 100%
+  );
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+// Mejoras de accesibilidad
+ion-button {
+  &:focus {
+    outline: 2px solid var(--ion-color-primary);
+    outline-offset: 2px;
+  }
+}
+
+.favorite-grid-item,
+ion-item {
+  &:focus {
+    outline: 2px solid var(--ion-color-primary);
+    outline-offset: 2px;
+  }
+}
+
+// Temas oscuros
+@media (prefers-color-scheme: dark) {
+  .favorite-grid-item {
+    background: var(--ion-color-step-50);
+    
+    .hero-name {
+      color: var(--ion-color-light);
+    }
+  }
+  
+  .modal-info {
+    background: var(--ion-color-step-100);
+    
+    h1 {
+      color: var(--ion-color-primary-tint);
+    }
+    
+    .detail-value {
+      color: var(--ion-color-light);
+    }
+  }
+}

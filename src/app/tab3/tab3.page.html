@@ -5,69 +5,9 @@
 </ion-header>
 
 <ion-content>
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Gestión de Imágenes</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-item>
-        <ion-label position="stacked">Seleccionar Héroe</ion-label>
-        <ion-select placeholder="Seleccione un héroe" (ionChange)="heroSelected($event)">
-          <ion-select-option *ngFor="let hero of heroes" [value]="hero._id">
-            {{ hero.nombre }}
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
-
-      @if (selectedHero) {
-        <div class="ion-padding-top">
-          <ion-button expand="block" color="success" (click)="showAddImagePrompt()">
-            <ion-icon slot="start" name="add-circle-outline"></ion-icon>
-            Agregar Imagen
-          </ion-button>
-        </div>
-      }
-    </ion-card-content>
-  </ion-card>
-
-  @if (selectedHero && heroImages.length > 0) {
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>Imágenes de {{ selectedHero.nombre }}</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <ion-grid>
-          <ion-row>
-            @for (imageUrl of heroImages; track $index) {
-              <ion-col size="6" size-md="4" size-lg="3" class="ion-margin-bottom">
-                <div class="image-container">
-                  <img [src]="imageUrl" (error)="handleImageError($event)" alt="Imagen de héroe" class="hero-img">
-                  <div class="image-actions">
-                    <ion-button fill="clear" color="danger" (click)="deleteImage($index)">
-                      <ion-icon name="trash-outline"></ion-icon>
-                    </ion-button>
-                  </div>
-                </div>
-              </ion-col>
-            }
-          </ion-row>
-        </ion-grid>
-      </ion-card-content>
-    </ion-card>
-  } @else if (selectedHero) {
-    <ion-card>
-      <ion-card-content class="ion-text-center ion-padding">
-        <ion-icon name="image-outline" size="large" color="medium"></ion-icon>
-        <p>Este héroe no tiene imágenes.</p>
-      </ion-card-content>
-    </ion-card>
-  }
-
-  @if (!selectedHero) {
-    <ion-card>
-      <ion-card-content class="ion-text-center ion-padding">
-        <p>Selecciona un héroe para ver o administrar sus imágenes.</p>
-      </ion-card-content>
-    </ion-card>
-  }
+  <app-gallery 
+    title="Gestión de Imágenes de Héroes"
+    selectLabel="Seleccionar Héroe"
+    selectPlaceholder="Seleccione un héroe">
+  </app-gallery>
 </ion-content>
