@@ -16,7 +16,6 @@
       <ion-label>
         <h3>Famosos: {{ visita.famosos_id.join(', ') }}</h3>
         <p>Sitio ID: {{ visita.sitio_id }}</p>
-        <p>Usuario ID: {{ visita.usuario_id }}</p>
         <p>Comentario: {{ visita.comentario }}</p>
         <small>{{ visita.fecha | date:'short' }}</small>
       </ion-label>
@@ -92,22 +91,6 @@
             
           </ion-item>
 
-          <!-- Selección de usuario -->
-          <ion-item>
-            <ion-label position="stacked">Usuario <span class="required">*</span></ion-label>
-            <ion-select 
-              [(ngModel)]="nuevaVisita.usuario_id" 
-              interface="popover" 
-              placeholder="Selecciona un usuario"
-              [class.invalid]="formSubmitted && !nuevaVisita.usuario_id">
-              <ion-select-option *ngFor="let usuario of usuarios" [value]="usuario.id">
-                {{ usuario.nombre }}
-              </ion-select-option>
-            </ion-select>
-            <ion-note *ngIf="formSubmitted && !nuevaVisita.usuario_id" color="danger">
-              Debes seleccionar un usuario
-            </ion-note>
-          </ion-item>
 
           <!-- Selección de sitio (obligatorio) -->
           <ion-item>
