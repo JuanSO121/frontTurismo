@@ -1,4 +1,4 @@
-package com.ciudades.app;
+package com.ciudad.app;
 
 import com.getcapacitor.BridgeActivity;
 

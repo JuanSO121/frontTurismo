@@ -24,10 +24,15 @@ export const routes: Routes = [
     path: 'mapa',
     loadComponent: () => import('./pages/mapa/mapa.page').then( m => m.MapaPage),
   },
+  {
+  path: 'mapa-rutas',
+  loadComponent: () => import('./components/mapa-rutas/mapa-rutas.component').then(m => m.MapaRutasComponent)
+},
     {
     path: 'visita',
     loadComponent: () => import('./pages/visita/visita.page').then( m => m.VisitaPage)
   },
+
 
   {
     path: '**',

@@ -236,5 +236,59 @@ crearVisita(visita: Partial<Visita>): Observable<any> {
         this.router.navigate(['/login']);
       });
   }
+
+  /**
+ * Obtiene todas las coordenadas de visitas del usuario
+ * @returns Observable con las coordenadas
+ */
+/**
+ * Obtiene todas las coordenadas de visitas del usuario actual
+ * @returns Observable con las coordenadas
+ */
+getCoordenadasVisitas(): Observable<any> {
+  const url = `${URL_TURISMO}/visitas/coordenadas`;
   
+  return this.getAuthHeaders().pipe(
+    switchMap(headers => {
+      // Verificar que tenemos headers de autenticación
+      const token = headers.get('x-token');
+      if (!token) {
+        return throwError(() => new Error('No autorizado: Token de autenticación no encontrado'));
+      }
+
+      console.log('Realizando petición a:', url);
+      console.log('Headers enviados:', headers);
+      
+      return this.http.get<any>(url, { headers }).pipe(
+        tap(response => {
+          console.log('Respuesta del servidor para coordenadas:', response);
+        }),
+        map(response => {
+          // Asegurar que la respuesta tenga la estructura esperada
+          if (response && typeof response === 'object') {
+            return response;
+          }
+          return { ok: false, data: [] };
+        }),
+        catchError((error: HttpErrorResponse) => {
+          console.error('Error en getCoordenadasVisitas:', error);
+          
+          // Manejar específicamente errores de autenticación
+          if (error.status === 401) {
+            this.handleAuthError();
+            return throwError(() => new Error('No autorizado: La sesión ha expirado'));
+          }
+          
+          return this.handleError(error);
+        })
+      );
+    }),
+    catchError(error => {
+      console.error('Error obteniendo headers de auth:', error);
+      return throwError(() => new Error('Error de autenticación: No se pudieron obtener las credenciales'));
+    })
+  );
+}
+
+
 }

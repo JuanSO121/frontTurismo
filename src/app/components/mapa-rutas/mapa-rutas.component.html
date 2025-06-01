@@ -1,0 +1,24 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/visita"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Ruta de Mis Visitas</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="recargarRuta()" [disabled]="isLoading">
+        <ion-icon name="refresh-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- Indicador de carga -->
+  <div *ngIf="isLoading" class="loading-container">
+    <ion-spinner></ion-spinner>
+    <p>Cargando ruta de visitas...</p>
+  </div>
+
+  <!-- Mapa -->
+  <div id="routeMap" style="height: 100vh; width: 100%;"></div>
+</ion-content>

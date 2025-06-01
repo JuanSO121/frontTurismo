@@ -36,7 +36,7 @@ import { IonCard } from '@ionic/angular/standalone';
 import { IonCardHeader, IonCardSubtitle, IonCardTitle } from '@ionic/angular/standalone';
 import { IonCardContent } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { createOutline, trashOutline, personOutline, peopleOutline, locationOutline, close, add } from 'ionicons/icons';
+import { createOutline, trashOutline, personOutline, peopleOutline, locationOutline, close, add, mapOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-visita',
@@ -107,7 +107,7 @@ export class VisitaPage implements OnInit {
     private authService: AuthService,
     private alertController: AlertController
   ) {
-    addIcons({ createOutline, trashOutline, personOutline, peopleOutline, locationOutline, close, add });
+    addIcons({mapOutline,peopleOutline,personOutline,createOutline,trashOutline,locationOutline,add,close});
   }
 
   async ngOnInit() {
@@ -493,4 +493,8 @@ export class VisitaPage implements OnInit {
       }
     }
   }
+
+  verRutaVisitas() {
+  this.router.navigate(['/mapa-rutas']);
+}
 }

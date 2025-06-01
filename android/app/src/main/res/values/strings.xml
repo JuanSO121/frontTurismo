@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">ciudades</string>
-    <string name="title_activity_main">ciudades</string>
-    <string name="package_name">com.ciudades.app</string>
-    <string name="custom_url_scheme">com.ciudades.app</string>
+    <string name="app_name">ciudad</string>
+    <string name="title_activity_main">ciudad</string>
+    <string name="package_name">com.ciudad.app</string>
+    <string name="custom_url_scheme">com.ciudad.app</string>
 </resources>
