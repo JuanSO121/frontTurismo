@@ -1,27 +1,67 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
-    <ion-title>Visitas</ion-title>
+    <ion-title>Mis Visitas</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
+  <!-- Encabezado que colapsa (para iOS) -->
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Visitas</ion-title>
+      <ion-title size="large">Mis Visitas</ion-title>
     </ion-toolbar>
   </ion-header>
+  <!-- Grid de cards -->
+  <div class="cards-container">
+    <ion-card *ngFor="let visita of visitas" class="visita-card">
+      <!-- Imagen principal -->
+      <img [src]="visita.img || defaultImage"
+           (error)="visita.img = defaultImage"
+           class="card-image"/>
+      
+      <!-- Contenido de la card -->
+      <ion-card-header>
+        <ion-card-title>{{ getNombreSitio(visita.sitio_id) }}</ion-card-title>
+        <ion-card-subtitle>
+          <ion-icon name="people-outline"></ion-icon>
+          #famoso{{ getNombresFamosos(visita.famoso_id) }}
+        </ion-card-subtitle>
+      </ion-card-header>
+      
+      <ion-card-content>
+        <p class="card-comment">comentario: {{ visita.comentario }}</p>
+        <div class="card-footer">
+          <small>{{ visita.fecha | date:'mediumDate' }}</small>
 
-  <ion-list>
-    <ion-item button detail (click)="abrirFormulario(visita)" *ngFor="let visita of visitas">
-      <ion-label>
-        <h3>Famosos: {{ visita.famosos_id.join(', ') }}</h3>
-        <p>Sitio ID: {{ visita.sitio_id }}</p>
-        <p>Comentario: {{ visita.comentario }}</p>
-        <small>{{ visita.fecha | date:'short' }}</small>
-      </ion-label>
-    </ion-item>
-  </ion-list>
+          <!-- Muestra el nombre del usuario creador -->
+       <div *ngIf="visita.usuario_id" class="usuario-creador">
+          <ion-icon name="person-outline"></ion-icon>
+          <small>Creado por: {{ getCorreoUsuario(visita.usuario_id) }}</small>
+      </div>
+  
+          
+          <!-- Botones de acciones -->
+          <div class="card-actions">
+            <ion-button fill="clear" size="small" (click)="abrirFormulario(visita)">
+              <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+            <ion-button fill="clear" size="small" color="danger" (click)="confirmarEliminar(visita._id)">
+              <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
 
+  <!-- Mensaje cuando no hay visitas -->
+  <div *ngIf="visitas.length === 0" class="empty-state">
+    <ion-icon name="location-outline" size="large"></ion-icon>
+    <h3>No hay visitas registradas</h3>
+    <p>Agrega tu primera visita usando el botón +</p>
+  </div>
+
+  <!-- Botón flotante -->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button (click)="abrirFormulario()">
       <ion-icon name="add"></ion-icon>
@@ -32,7 +72,7 @@
     <ng-template>
       <ion-header>
         <ion-toolbar>
-          <ion-title>Nueva Visita</ion-title>
+          <ion-title>{{ nuevaVisita._id ? 'Editar Visita' : 'Nueva Visita' }}</ion-title>
           <ion-buttons slot="end">
             <ion-button (click)="cerrarFormulario()">
               <ion-icon name="close"></ion-icon>
@@ -77,36 +117,33 @@
 
           <!-- Selección múltiple de famosos -->
           <ion-item>
-            <ion-label position="stacked">Famoso(s)</ion-label>
+            <ion-label position="stacked">Famoso(s) <span class="required">*</span></ion-label>
             <ion-select 
-              [(ngModel)]="nuevaVisita.famosos_id" 
+              [(ngModel)]="nuevaVisita.famoso_id" 
               multiple 
               interface="popover" 
               placeholder="Selecciona uno o más famosos"
-              >
-              <ion-select-option *ngFor="let famoso of famosos" [value]="famoso.id">
+              [class.invalid]="formSubmitted && nuevaVisita.famoso_id.length === 0">
+              <ion-select-option *ngFor="let famoso of famosos" [value]="famoso._id">
                 {{ famoso.nombre }}
               </ion-select-option>
             </ion-select>
-            
+            <ion-note *ngIf="formSubmitted && nuevaVisita.famoso_id.length === 0" color="danger">
+              Debes seleccionar al menos un famoso
+            </ion-note>
           </ion-item>
 
-
-          <!-- Selección de sitio (obligatorio) -->
+          <!-- Selección de sitio -->
           <ion-item>
-            <ion-label position="stacked">Sitio <span class="required">*</span></ion-label>
+            <ion-label position="stacked">Sitio</ion-label>
             <ion-select 
               [(ngModel)]="nuevaVisita.sitio_id" 
               interface="popover" 
-              placeholder="Selecciona un sitio"
-              [class.invalid]="formSubmitted && !nuevaVisita.sitio_id">
-              <ion-select-option *ngFor="let sitio of sitios" [value]="sitio.id">
+              placeholder="Selecciona un sitio">
+              <ion-select-option *ngFor="let sitio of sitios" [value]="sitio._id">
                 {{ sitio.nombre }}
               </ion-select-option>
             </ion-select>
-            <ion-note *ngIf="formSubmitted && !nuevaVisita.sitio_id" color="danger">
-              Debes seleccionar un sitio
-            </ion-note>
           </ion-item>
 
           <!-- Comentario -->
@@ -123,7 +160,7 @@
           </ion-item>
 
           <ion-button expand="block" (click)="guardarVisita()" class="ion-margin-top">
-            Guardar Visita
+            {{ nuevaVisita._id ? 'Actualizar Visita' : 'Guardar Visita' }}
           </ion-button>
         </div>
       </ion-content>
