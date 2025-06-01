@@ -4,20 +4,19 @@ import { FormsModule } from '@angular/forms';
 import {
   IonContent, IonHeader, IonTitle, IonToolbar,
   IonButtons,
-  IonBackButton,
-} from '@ionic/angular/standalone';
+  IonBackButton, IonButton, IonIcon } from '@ionic/angular/standalone';
 import { Heroe } from 'src/app/interfaces/heroes.interface';
 import { ActivatedRoute} from '@angular/router';
 import { HeroesBDService } from 'src/app/services/heroes-bd.service';
 import { HeroeEditComponent } from 'src/app/components/heroe-edit/heroe-edit.component';
-
+import { AuthService } from 'src/app/services/autenticacion/auth.service';
 
 @Component({
   selector: 'app-heroe',
   templateUrl: './heroe.page.html',
   styleUrls: ['./heroe.page.scss'],
   standalone: true,
-  imports: [
+  imports: [IonIcon, IonButton, 
     IonBackButton,
     IonButtons,
     IonContent,
@@ -51,6 +50,7 @@ export class HeroePage implements OnInit {
   constructor(
     private activatedRoute: ActivatedRoute,
     private bd: HeroesBDService,
+    private authService: AuthService,
 
     ) {
 
@@ -82,6 +82,10 @@ export class HeroePage implements OnInit {
         console.log("MIHeroePAGE", this.heroe);
 
       });
+  }
+
+  logout() {
+    this.authService.logout();
   }
 
 

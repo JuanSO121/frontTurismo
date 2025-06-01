@@ -6,6 +6,9 @@ import { Heroe } from '../interfaces/heroes.interface';
 import { StorageService } from './storage.service';
 import { Router } from '@angular/router';
 
+import { Famoso } from '../interfaces/turismo.interfac';
+import { URL_TURISMO } from '../config/url.servicios';
+
 @Injectable({
   providedIn: 'root'
 })

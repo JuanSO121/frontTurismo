@@ -47,7 +47,7 @@ import {
   refreshOutline, ellipsisVertical, imageOutline, timeOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 
-import { FavoriteService, FavoriteImage } from '../services/favorite.service';
+import { FavoriteService, FavoriteImage } from '../services/favoritos/favorite.service';
 import { Subscription } from 'rxjs';
 
 @Component({

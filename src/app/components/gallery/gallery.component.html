@@ -3,16 +3,41 @@
     <ion-card-title>{{ title }}</ion-card-title>
   </ion-card-header>
   <ion-card-content>
+    <!-- Selector de País -->
     <ion-item>
-      <ion-label position="stacked">{{ selectLabel }}</ion-label>
-      <ion-select [placeholder]="selectPlaceholder" (ionChange)="characterSelected($event)">
-        <ion-select-option *ngFor="let character of characters" [value]="character._id">
-          {{ character.nombre }}
+      <ion-label position="stacked">Seleccionar País</ion-label>
+      <ion-select placeholder="Selecciona un país" (ionChange)="paisSelected($event)">
+        <ion-select-option *ngFor="let pais of paises" [value]="pais._id">
+          {{ pais.nombre }}
         </ion-select-option>
       </ion-select>
     </ion-item>
 
-    @if (selectedCharacter) {
+    <!-- Selector de Ciudad -->
+    @if (selectedPais && ciudades.length > 0) {
+      <ion-item>
+        <ion-label position="stacked">Seleccionar Ciudad</ion-label>
+        <ion-select placeholder="Selecciona una ciudad" (ionChange)="ciudadSelected($event)">
+          <ion-select-option *ngFor="let ciudad of ciudades" [value]="ciudad">
+            {{ ciudad }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+    }
+
+    <!-- Selector de Famoso -->
+    @if (selectedCiudad && famosos.length > 0) {
+      <ion-item>
+        <ion-label position="stacked">Seleccionar Famoso</ion-label>
+        <ion-select placeholder="Selecciona un famoso" (ionChange)="famosoSelected($event)">
+          <ion-select-option *ngFor="let famoso of famosos" [value]="famoso._id">
+            {{ famoso.nombre }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+    }
+
+    @if (selectedFamoso) {
       <div class="ion-padding-top">
         <ion-button expand="block" color="success" (click)="showAddImagePrompt()">
           <ion-icon slot="start" name="add-circle-outline"></ion-icon>
@@ -23,18 +48,18 @@
   </ion-card-content>
 </ion-card>
 
-@if (selectedCharacter && characterImages.length > 0) {
+@if (selectedFamoso && famosoImages.length > 0) {
   <ion-card>
     <ion-card-header>
-      <ion-card-title>Imágenes de {{ selectedCharacter.nombre }}</ion-card-title>
+      <ion-card-title>Imágenes de {{ selectedFamoso.nombre }}</ion-card-title>
     </ion-card-header>
     <ion-card-content>
       <ion-grid>
         <ion-row>
-          @for (imageUrl of characterImages; track $index) {
+          @for (imageUrl of famosoImages; track $index) {
             <ion-col size="6" size-md="4" size-lg="3" class="ion-margin-bottom">
               <div class="image-container" (click)="openImageModal(imageUrl, $index)">
-                <img [src]="imageUrl" (error)="handleImageError($event)" alt="Imagen de personaje" class="character-img">
+                <img [src]="imageUrl" (error)="handleImageError($event)" alt="Imagen de famoso" class="character-img">
                 <div class="image-overlay">
                   <ion-icon name="information-circle-outline" class="info-icon"></ion-icon>
                 </div>
@@ -53,29 +78,43 @@
       </ion-grid>
     </ion-card-content>
   </ion-card>
-} @else if (selectedCharacter) {
+} @else if (selectedFamoso) {
   <ion-card>
     <ion-card-content class="ion-text-center ion-padding">
       <ion-icon name="image-outline" size="large" color="medium"></ion-icon>
-      <p>Este personaje no tiene imágenes.</p>
+      <p>Este famoso no tiene imágenes.</p>
     </ion-card-content>
   </ion-card>
 }
 
-@if (!selectedCharacter) {
+@if (!selectedFamoso && !selectedCiudad && !selectedPais) {
   <ion-card>
     <ion-card-content class="ion-text-center ion-padding">
-      <p>Selecciona un personaje para ver o administrar sus imágenes.</p>
+      <p>Selecciona un país para comenzar a explorar famosos.</p>
+    </ion-card-content>
+  </ion-card>
+} @else if (selectedPais && ciudades.length === 0) {
+  <ion-card>
+    <ion-card-content class="ion-text-center ion-padding">
+      <ion-icon name="location-outline" size="large" color="medium"></ion-icon>
+      <p>No hay ciudades disponibles para este país.</p>
+    </ion-card-content>
+  </ion-card>
+} @else if (selectedCiudad && famosos.length === 0) {
+  <ion-card>
+    <ion-card-content class="ion-text-center ion-padding">
+      <ion-icon name="person-outline" size="large" color="medium"></ion-icon>
+      <p>No hay famosos registrados en esta ciudad.</p>
     </ion-card-content>
   </ion-card>
 }
 
-<!-- Modal de información del personaje -->
+<!-- Modal de información del famoso -->
 <ion-modal [isOpen]="isModalOpen" (didDismiss)="closeModal()">
   <ng-template>
     <ion-header class="modal-header">
       <ion-toolbar color="dark">
-        <ion-title class="modal-title">{{ selectedCharacter?.nombre }}</ion-title>
+        <ion-title class="modal-title">{{ selectedFamoso?.nombre }}</ion-title>
         <ion-button slot="end" fill="clear" color="light" (click)="closeModal()">
           <ion-icon name="close-outline"></ion-icon>
         </ion-button>
@@ -89,11 +128,11 @@
           <div class="main-image-container">
             <img [src]="getCurrentImageUrl()" 
                  (error)="handleImageError($event)" 
-                 alt="{{ selectedCharacter?.nombre }}" 
+                 alt="{{ selectedFamoso?.nombre }}" 
                  class="main-hero-image">
             <div class="image-gradient-overlay"></div>
             <div class="image-info-badge">
-              <span>{{ getCharacterInfo() }}</span>
+              <span>{{ getFamosoInfo() }}</span>
             </div>
             <!-- Botón de favorito en el modal -->
             <div class="modal-favorite-button" (click)="toggleFavorite(selectedImageIndex)">
@@ -104,19 +143,25 @@
           </div>
         </div>
 
-        <!-- Información del personaje -->
+        <!-- Información del famoso -->
         <div class="hero-info-section">
           <div class="hero-header">
-            <h1 class="hero-name">{{ selectedCharacter?.nombre }}</h1>
+            <h1 class="hero-name">{{ selectedFamoso?.nombre }}</h1>
             <div class="hero-badges">
-              <ion-chip color="primary" class="casa-chip">
-                <ion-icon name="business-outline"></ion-icon>
-                <ion-label>{{ selectedCharacter?.casa }}</ion-label>
+              <ion-chip color="primary" class="categoria-chip">
+                <ion-icon name="person-outline"></ion-icon>
+                <ion-label>{{ selectedFamoso?.categoria }}</ion-label>
               </ion-chip>
-              @if (selectedCharacter?.aparicion) {
-                <ion-chip color="secondary" class="aparicion-chip">
-                  <ion-icon name="calendar-outline"></ion-icon>
-                  <ion-label>{{ selectedCharacter?.aparicion | date:'yyyy' }}</ion-label>
+              @if (selectedFamoso?.ciudad) {
+                <ion-chip color="secondary" class="ciudad-chip">
+                  <ion-icon name="location-outline"></ion-icon>
+                  <ion-label>{{ selectedFamoso?.ciudad }}</ion-label>
+                </ion-chip>
+              }
+              @if (selectedPais) {
+                <ion-chip color="tertiary" class="pais-chip">
+                  <ion-icon name="globe-outline"></ion-icon>
+                  <ion-label>{{ selectedPais?.nombre }}</ion-label>
                 </ion-chip>
               }
               @if (isFavorite(selectedImageIndex)) {
@@ -131,23 +176,39 @@
           <div class="hero-bio-section">
             <h3 class="bio-title">
               <ion-icon name="information-circle-outline"></ion-icon>
-              Biografía
+              Descripción
             </h3>
-            <p class="hero-bio">{{ selectedCharacter?.bio }}</p>
+            <p class="hero-bio">{{ selectedFamoso?.descripcion || 'No hay descripción disponible para este famoso.' }}</p>
           </div>
 
           <div class="hero-stats">
             <div class="stat-item">
               <span class="stat-label">Total de imágenes</span>
-              <ion-badge color="success" class="stat-value">{{ characterImages.length }}</ion-badge>
+              <ion-badge color="success" class="stat-value">{{ famosoImages.length }}</ion-badge>
             </div>
             <div class="stat-item">
               <span class="stat-label">Imagen actual</span>
               <ion-badge color="primary" class="stat-value">{{ selectedImageIndex + 1 }}</ion-badge>
             </div>
+            @if (selectedFamoso?.categoria) {
+              <div class="stat-item">
+                <span class="stat-label">Categoría</span>
+                <ion-badge color="secondary" class="stat-value">{{ selectedFamoso?.categoria }}</ion-badge>
+              </div>
+            }
           </div>
         </div>
       </div>
     </ion-content>
   </ng-template>
 </ion-modal>
+
+<!-- Toast para notificaciones -->
+<ion-toast
+  [isOpen]="isToastOpen"
+  [message]="toastMessage"
+  [duration]="2000"
+  [color]="toastColor"
+  position="bottom"
+  (didDismiss)="isToastOpen=false">
+</ion-toast>

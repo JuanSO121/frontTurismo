@@ -46,13 +46,14 @@ import {
   saveOutline,
   imageOutline,
   timerOutline,
-  homeOutline, informationCircleOutline } from 'ionicons/icons';
+  homeOutline, informationCircleOutline, logOutOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { Heroe } from 'src/app/interfaces/heroes.interface';
 
 import { Router } from '@angular/router';
 import { Observable, catchError, finalize, from, of, tap } from 'rxjs';
 import { HeroesBDService } from 'src/app/services/heroes-bd.service';
+import { AuthService } from 'src/app/services/autenticacion/auth.service';
 
 @Component({
   selector: 'app-heroes',
@@ -130,14 +131,20 @@ Array: any;
     private heroesService: HeroesBDService,
     private alertController: AlertController,
     private toastController: ToastController,
-    private router: Router
+    private router: Router,
+    private authService: AuthService,
   ) {
     // Registrar los iconos que utilizaremos
-    addIcons({timerOutline,createOutline,trashOutline,homeOutline,addOutline,closeOutline,imageOutline,informationCircleOutline,saveOutline});
+    addIcons({logOutOutline,timerOutline,createOutline,trashOutline,homeOutline,addOutline,closeOutline,imageOutline,informationCircleOutline,saveOutline});
   }
 
   ngOnInit() {
     this.loadHeroes();
+  }
+
+  
+  logout() {
+    this.authService.logout();
   }
 
   /**

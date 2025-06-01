@@ -39,12 +39,16 @@ import {
   informationCircleOutline, 
   businessOutline,
   heartOutline,
-  heart
+  heart,
+  locationOutline,
+  globeOutline,
+  personOutline
 } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
-import { Heroe } from 'src/app/interfaces/heroes.interface';
-import { HeroesBDService } from 'src/app/services/heroes-bd.service';
-import { FavoriteService } from 'src/app/services/favorite.service';
+import { Famoso, Pais } from 'src/app/interfaces/turismo.interfac';
+import { FamososService } from 'src/app/services/turismo/famosos.service';
+import { PaisesService } from 'src/app/services/turismo/paises.service';
+import { FavoriteService } from 'src/app/services/favoritos/favorite.service';
 
 @Component({
   selector: 'app-gallery',
@@ -79,14 +83,20 @@ import { FavoriteService } from 'src/app/services/favorite.service';
   ]
 })
 export class GalleryComponent implements OnInit {
-  @Input() title: string = 'Galería de Imágenes';
-  @Input() selectLabel: string = 'Seleccionar Héroe';
-  @Input() selectPlaceholder: string = 'Seleccione un héroe';
+  @Input() title: string = 'Galería de Famosos';
   
-  characters: Heroe[] = [];
-  selectedCharacter: Heroe | null = null;
+  // Datos principales
+  paises: Pais[] = [];
+  ciudades: string[] = [];
+  famosos: Famoso[] = [];
   
-  characterImages: string[] = [];
+  // Selecciones actuales
+  selectedPais: Pais | null = null;
+  selectedCiudad: string = '';
+  selectedFamoso: Famoso | null = null;
+  
+  // Imágenes
+  famosoImages: string[] = [];
   defaultImage: string = 'assets/img/no-image.png';
   
   // Modal properties
@@ -100,7 +110,8 @@ export class GalleryComponent implements OnInit {
   toastColor: string = 'success';
 
   constructor(
-    private heroesBDService: HeroesBDService,
+    private famososService: FamososService,
+    private paisesService: PaisesService,
     private favoriteService: FavoriteService,
     private alertController: AlertController,
     private loadingController: LoadingController,
@@ -116,74 +127,196 @@ export class GalleryComponent implements OnInit {
       businessOutline,
       calendarOutline,
       heartOutline,
-      heart
+      heart,
+      locationOutline,
+      globeOutline,
+      personOutline
     });
   }
 
   ngOnInit() {
-    this.loadCharacters();
+    this.loadPaises();
   }
 
-  async loadCharacters() {
-    const loading = await this.presentLoading('Cargando personajes...');
+  async loadPaises() {
+    const loading = await this.presentLoading('Cargando países...');
     
     try {
-      this.heroesBDService.getHeroes().subscribe({
+      this.paisesService.getPaises().subscribe({
         next: (response) => {
-          if (response && response.Ok && response.resp) {
-            this.characters = response.resp;
-            console.log('Personajes cargados:', this.characters);
+          if (response && response.ok && response.data) {
+            this.paises = response.data;
+            console.log('Países cargados:', this.paises);
           } else {
             console.error('Formato de respuesta inesperado:', response);
           }
           loading.dismiss();
         },
         error: (error) => {
-          console.error('Error al cargar personajes:', error);
-          this.presentAlert('Error', 'No se pudieron cargar los personajes');
+          console.error('Error al cargar países:', error);
+          this.presentAlert('Error', 'No se pudieron cargar los países');
           loading.dismiss();
         }
       });
     } catch (error) {
-      console.error('Error en la carga de personajes:', error);
+      console.error('Error en la carga de países:', error);
       loading.dismiss();
     }
   }
 
-  async characterSelected(event: Event) {
+  async paisSelected(event: Event) {
     const selectElement = event.target as HTMLIonSelectElement;
-    const characterId = selectElement.value;
+    const paisId = selectElement.value;
     
-    if (!characterId) {
-      this.selectedCharacter = null;
-      this.characterImages = [];
+    // Reset selections
+    this.selectedCiudad = '';
+    this.selectedFamoso = null;
+    this.famosos = [];
+    this.famosoImages = [];
+    this.ciudades = [];
+    
+    if (!paisId) {
+      this.selectedPais = null;
       return;
     }
     
-    this.selectedCharacter = this.characters.find(character => character._id === characterId) || null;
+    this.selectedPais = this.paises.find(pais => pais._id === paisId) || null;
     
-    if (this.selectedCharacter) {
-      await this.loadCharacterImages(characterId);
+    if (this.selectedPais) {
+      await this.loadCiudadesByPais(paisId);
     }
   }
 
-  async loadCharacterImages(characterId: string) {
-    const loading = await this.presentLoading('Cargando imágenes...');
+  async loadCiudadesByPais(paisId: string) {
+    const loading = await this.presentLoading('Cargando ciudades...');
     
     try {
-      this.heroesBDService.getHeroeImages(characterId).subscribe({
-        next: (images) => {
-          this.characterImages = images || [];
-          console.log('Imágenes cargadas:', this.characterImages);
+      this.paisesService.getCiudadesByPais(paisId).subscribe({
+        next: (ciudades: string[]) => {
+          this.ciudades = ciudades || [];
+          console.log('Ciudades cargadas:', this.ciudades);
           loading.dismiss();
         },
         error: (error) => {
-          console.error('Error al cargar imágenes:', error);
-          this.presentAlert('Error', 'No se pudieron cargar las imágenes');
-          this.characterImages = [];
+          console.error('Error al cargar ciudades:', error);
+          // Si no hay endpoint específico, obtener ciudades de los famosos
+          this.loadCiudadesFromFamosos();
           loading.dismiss();
         }
       });
+    } catch (error) {
+      console.error('Error en la carga de ciudades:', error);
+      this.loadCiudadesFromFamosos();
+      loading.dismiss();
+    }
+  }
+
+  async loadCiudadesFromFamosos() {
+    if (!this.selectedPais) return;
+    
+    try {
+      this.famososService.getFamososByPais(this.selectedPais.nombre).subscribe({
+        next: (response) => {
+          if (response && response.ok && response.data) {
+            const famososDelPais = response.data as Famoso[];
+            // Extraer ciudades únicas - Corregido el error de TypeScript
+            const ciudadesUnicas = [...new Set(
+              famososDelPais
+                .map((f: Famoso) => f.ciudad)
+                .filter((ciudad): ciudad is string => 
+                  typeof ciudad === 'string' && ciudad.trim() !== ''
+                )
+            )];
+            this.ciudades = ciudadesUnicas;
+            console.log('Ciudades extraídas de famosos:', this.ciudades);
+          }
+        },
+        error: (error) => {
+          console.error('Error al obtener ciudades de famosos:', error);
+        }
+      });
+    } catch (error) {
+      console.error('Error al extraer ciudades de famosos:', error);
+    }
+  }
+
+  async ciudadSelected(event: Event) {
+    const selectElement = event.target as HTMLIonSelectElement;
+    this.selectedCiudad = selectElement.value;
+    
+    // Reset selections
+    this.selectedFamoso = null;
+    this.famosoImages = [];
+    this.famosos = [];
+    
+    if (!this.selectedCiudad) {
+      return;
+    }
+    
+    await this.loadFamososByCiudad(this.selectedCiudad);
+  }
+
+  async loadFamososByCiudad(ciudad: string) {
+    const loading = await this.presentLoading('Cargando famosos...');
+    
+    try {
+      this.famososService.getFamososByCiudad(ciudad).subscribe({
+        next: (response) => {
+          if (response && response.ok && response.data) {
+            this.famosos = response.data;
+            console.log('Famosos cargados:', this.famosos);
+          } else {
+            console.error('Formato de respuesta inesperado:', response);
+          }
+          loading.dismiss();
+        },
+        error: (error) => {
+          console.error('Error al cargar famosos:', error);
+          this.presentAlert('Error', 'No se pudieron cargar los famosos');
+          loading.dismiss();
+        }
+      });
+    } catch (error) {
+      console.error('Error en la carga de famosos:', error);
+      loading.dismiss();
+    }
+  }
+
+  async famosoSelected(event: Event) {
+    const selectElement = event.target as HTMLIonSelectElement;
+    const famosoId = selectElement.value;
+    
+    if (!famosoId) {
+      this.selectedFamoso = null;
+      this.famosoImages = [];
+      return;
+    }
+    
+    this.selectedFamoso = this.famosos.find(famoso => famoso._id === famosoId) || null;
+    
+    if (this.selectedFamoso) {
+      await this.loadFamosoImages(famosoId);
+    }
+  }
+
+  async loadFamosoImages(famosoId: string) {
+    const loading = await this.presentLoading('Cargando imágenes...');
+    
+    try {
+      if (this.selectedFamoso && this.selectedFamoso.img) {
+        // Si img es un array
+        if (Array.isArray(this.selectedFamoso.img)) {
+          this.famosoImages = this.selectedFamoso.img;
+        } else {
+          // Si img es un string
+          this.famosoImages = [this.selectedFamoso.img];
+        }
+      } else {
+        this.famosoImages = [];
+      }
+      
+      console.log('Imágenes cargadas:', this.famosoImages);
+      loading.dismiss();
     } catch (error) {
       console.error('Error en la carga de imágenes:', error);
       loading.dismiss();
@@ -208,7 +341,7 @@ export class GalleryComponent implements OnInit {
         {
           text: 'Agregar',
           handler: (data) => {
-            if (data.imageUrl && this.selectedCharacter) {
+            if (data.imageUrl && this.selectedFamoso) {
               this.addImage(data.imageUrl);
             }
           }
@@ -220,8 +353,8 @@ export class GalleryComponent implements OnInit {
   }
 
   async addImage(imageUrl: string) {
-    if (!this.selectedCharacter || !this.selectedCharacter._id) {
-      await this.presentAlert('Error', 'Primero selecciona un personaje');
+    if (!this.selectedFamoso || !this.selectedFamoso._id) {
+      await this.presentAlert('Error', 'Primero selecciona un famoso');
       return;
     }
 
@@ -233,11 +366,23 @@ export class GalleryComponent implements OnInit {
     const loading = await this.presentLoading('Agregando imagen...');
 
     try {
-      this.heroesBDService.addHeroeImage(this.selectedCharacter._id, imageUrl).subscribe({
+      // Actualizar el famoso con la nueva imagen - Corregido el tipo
+      const updatedFamoso: Famoso = { ...this.selectedFamoso };
+      
+      if (Array.isArray(updatedFamoso.img)) {
+        updatedFamoso.img.push(imageUrl);
+      } else if (updatedFamoso.img) {
+        updatedFamoso.img = [updatedFamoso.img, imageUrl];
+      } else {
+        updatedFamoso.img = [imageUrl];
+      }
+
+      this.famososService.crud_Famosos(updatedFamoso, 'modificar').subscribe({
         next: (response) => {
           console.log('Imagen agregada:', response);
-          // Recargar las imágenes para ver la nueva
-          this.loadCharacterImages(this.selectedCharacter!._id!);
+          // Recargar las imágenes
+          this.loadFamosoImages(this.selectedFamoso!._id!);
+          this.showToast('Imagen agregada exitosamente', 'success');
           loading.dismiss();
         },
         error: (error) => {
@@ -253,7 +398,7 @@ export class GalleryComponent implements OnInit {
   }
 
   async deleteImage(imageIndex: number) {
-    if (!this.selectedCharacter || !this.selectedCharacter._id) {
+    if (!this.selectedFamoso || !this.selectedFamoso._id) {
       return;
     }
 
@@ -271,11 +416,17 @@ export class GalleryComponent implements OnInit {
             const loading = await this.presentLoading('Eliminando imagen...');
             
             try {
-              this.heroesBDService.deleteHeroeImage(this.selectedCharacter!._id!, imageIndex).subscribe({
+              const updatedFamoso: Famoso = { ...this.selectedFamoso! };
+              
+              if (Array.isArray(updatedFamoso.img)) {
+                updatedFamoso.img.splice(imageIndex, 1);
+              }
+
+              this.famososService.crud_Famosos(updatedFamoso, 'modificar').subscribe({
                 next: (response) => {
                   console.log('Imagen eliminada:', response);
-                  // Recargar las imágenes para reflejar el cambio
-                  this.loadCharacterImages(this.selectedCharacter!._id!);
+                  this.loadFamosoImages(this.selectedFamoso!._id!);
+                  this.showToast('Imagen eliminada exitosamente', 'warning');
                   loading.dismiss();
                 },
                 error: (error) => {
@@ -297,24 +448,24 @@ export class GalleryComponent implements OnInit {
   }
 
   async toggleFavorite(imageIndex: number) {
-    if (!this.selectedCharacter || !this.selectedCharacter._id) {
+    if (!this.selectedFamoso || !this.selectedFamoso._id) {
       return;
     }
 
-    const imageUrl = this.characterImages[imageIndex];
-    const heroId = this.selectedCharacter._id;
-    const heroName = this.selectedCharacter.nombre;
+    const imageUrl = this.famosoImages[imageIndex];
+    const famosoId = this.selectedFamoso._id;
+    const famosoName = this.selectedFamoso.nombre;
 
     try {
-      const isFavorite = this.favoriteService.isFavorite(heroId, imageIndex);
+      const isFavorite = this.favoriteService.isFavorite(famosoId, imageIndex);
       
       if (isFavorite) {
-        const success = await this.favoriteService.removeFromFavorites(heroId, imageIndex);
+        const success = await this.favoriteService.removeFromFavorites(famosoId, imageIndex);
         if (success) {
           this.showToast('Imagen eliminada de favoritos', 'warning');
         }
       } else {
-        const success = await this.favoriteService.addToFavorites(heroId, heroName, imageUrl, imageIndex);
+        const success = await this.favoriteService.addToFavorites(famosoId, famosoName, imageUrl, imageIndex);
         if (success) {
           this.showToast('Imagen agregada a favoritos', 'success');
         } else {
@@ -328,10 +479,10 @@ export class GalleryComponent implements OnInit {
   }
 
   isFavorite(imageIndex: number): boolean {
-    if (!this.selectedCharacter || !this.selectedCharacter._id) {
+    if (!this.selectedFamoso || !this.selectedFamoso._id) {
       return false;
     }
-    return this.favoriteService.isFavorite(this.selectedCharacter._id, imageIndex);
+    return this.favoriteService.isFavorite(this.selectedFamoso._id, imageIndex);
   }
 
   handleImageError(event: Event) {
@@ -356,14 +507,10 @@ export class GalleryComponent implements OnInit {
     return this.selectedImageUrl || this.defaultImage;
   }
 
-  getCharacterInfo(): string {
-    if (!this.selectedCharacter) return '';
+  getFamosoInfo(): string {
+    if (!this.selectedFamoso) return '';
     
-    const aparicionYear = this.selectedCharacter.aparicion ? 
-      new Date(this.selectedCharacter.aparicion).getFullYear() : 
-      'Desconocido';
-    
-    return `Imagen ${this.selectedImageIndex + 1} de ${this.characterImages.length} • ${aparicionYear}`;
+    return `Imagen ${this.selectedImageIndex + 1} de ${this.famosoImages.length} • ${this.selectedFamoso.categoria}`;
   }
 
   async presentLoading(message: string) {

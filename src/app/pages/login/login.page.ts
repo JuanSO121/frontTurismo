@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { HeroesBDService } from '../../services/heroes-bd.service';
+
 import { CommonModule } from '@angular/common';
 import { IonicModule, ToastController } from '@ionic/angular';
 import { StorageService } from '../../services/storage.service';
+import { AuthService } from 'src/app/services/autenticacion/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -20,7 +21,7 @@ export class LoginPage implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder,
-    private heroesBDService: HeroesBDService,
+    private auth: AuthService,
     private router: Router,
     private toastController: ToastController,
     private storageService: StorageService
@@ -59,7 +60,7 @@ export class LoginPage implements OnInit {
     const password = this.loginForm.value.password;
 
     try {
-      this.heroesBDService.login(email, password)
+      this.auth.login(email, password)
         .subscribe({
           next: async (response) => {
             console.log('Login response:', response);
