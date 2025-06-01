@@ -1,41 +1,83 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonImg } from '@ionic/angular/standalone';
-import { IonicModule, ModalController } from '@ionic/angular';
+import { 
+  IonContent, 
+  IonHeader, 
+  IonTitle, 
+  IonToolbar, 
+  IonImg,
+  IonList,
+  IonItem,
+  IonLabel,
+  IonButtons,
+  IonButton,
+  IonIcon,
+  IonFab,
+  IonFabButton,
+  IonModal,
+  IonInput,
+  IonSelect,
+  IonSelectOption,
+  IonTextarea,
+  IonNote,
+  AlertController,
+  ModalController, IonAvatar } from '@ionic/angular/standalone';
 import { QrScannerComponent } from 'src/app/components/qr-scanner/qr-scanner.component';
 import { MapViewComponent } from 'src/app/components/map-view/map-view.component';
 import { Router } from '@angular/router';
+import { VisitaService } from 'src/app/services/turismo/visitas.service';
+import { FamososService } from 'src/app/services/turismo/famosos.service';
+import { AuthService } from 'src/app/services/autenticacion/auth.service';
+import { IonCard } from '@ionic/angular/standalone';
+import { IonCardHeader, IonCardSubtitle, IonCardTitle } from '@ionic/angular/standalone';
+import { IonCardContent } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { createOutline, trashOutline, personOutline, peopleOutline, locationOutline, close, add } from 'ionicons/icons';
 
 @Component({
   selector: 'app-visita',
   templateUrl: './visita.page.html',
   styleUrls: ['./visita.page.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule, QrScannerComponent, MapViewComponent, IonImg]
+  imports: [IonAvatar, 
+    CommonModule, 
+    FormsModule, 
+    QrScannerComponent, 
+    MapViewComponent,
+    IonContent,
+    IonHeader,
+    IonTitle,
+    IonToolbar,
+    IonImg,
+    IonList,
+    IonItem,
+    IonLabel,
+    IonButtons,
+    IonButton,
+    IonIcon,
+    IonFab,
+    IonFabButton,
+    IonModal,
+    IonInput,
+    IonSelect,
+    IonSelectOption,
+    IonTextarea,
+    IonNote, IonAvatar, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent
+  ]
 })
-export class VisitaPage {
-  visitas: Array<{ famosos_id: string[]; sitio_id: string; comentario: string; fecha: Date; img: string }> = [];
+export class VisitaPage implements OnInit {
+  visitas: any[] = [];
   mostrarFormulario = false;
-  defaultImage = 'assets/imgs/default-image.jpg'; // Ruta a tu imagen por defecto
+  defaultImage = './assets/img/lugares-turisticos-de-colombia.png';
+  famosos: any[] = [];
+  sitios: any[] = [];
+  usuariosCache: { [key: string]: any } = {}; // Cache para almacenar datos de usuarios
 
-  // Lista de famosos
-  famosos = [
-    { id: '1', nombre: 'Famoso A' },
-    { id: '2', nombre: 'Famoso B' },
-    { id: '3', nombre: 'Famoso C' }
-  ];
 
-  // Lista de sitios
-  sitios = [
-    { id: '1', nombre: 'Sitio A' },
-    { id: '2', nombre: 'Sitio B' },
-    { id: '3', nombre: 'Sitio C' }
-  ];
-
-  nuevaVisita = {
+  nuevaVisita: any = {
     _id: '',
-    famosos_id: [] as string[],
+    famoso_id: [],
     sitio_id: '',
     fecha: '',
     comentario: '',
@@ -45,12 +87,92 @@ export class VisitaPage {
   };
 
   formSubmitted = false;
-  alertController: any;
+  usuarioActual: any;
 
-  constructor(private modalCtrl: ModalController, private router: Router) {}
+  constructor(
+    private modalCtrl: ModalController,
+    private router: Router,
+    private visitaService: VisitaService,
+    private famososService: FamososService,
+    private authService: AuthService,
+    private alertController: AlertController
+  ) {
+    addIcons({ createOutline, trashOutline, personOutline, peopleOutline, locationOutline, close, add });
+  }
+
+  async ngOnInit() {
+    await this.cargarDatosIniciales();
+  }
+
+  async cargarDatosIniciales() {
+    try {
+      const isAuth = await this.authService.isAuthenticated();
+      if (!isAuth) {
+        this.router.navigate(['/login']);
+        return;
+      }
+
+      this.authService.getCurrentUser().subscribe({
+        next: (usuario) => {
+          this.usuarioActual = usuario;
+          console.log('Usuario actual cargado:', this.usuarioActual);
+          this.cargarVisitas();
+        },
+        error: (error) => {
+          console.error('Error al obtener usuario:', error);
+          this.router.navigate(['/login']);
+        }
+      });
+
+      this.famososService.getFamosos().subscribe({
+        next: (response) => {
+          if (response && response.ok && response.data) {
+            this.famosos = response.data;
+          } else {
+            this.mostrarAlerta('Error', 'No se pudieron cargar los famosos');
+          }
+        },
+        error: (error) => {
+          console.error('Error al cargar famosos:', error);
+          this.mostrarAlerta('Error', 'No se pudieron cargar los famosos');
+        }
+      });
+
+      this.sitios = [
+        { _id: '1', nombre: 'Sitio A' },
+        { _id: '2', nombre: 'Sitio B' },
+        { _id: '3', nombre: 'Sitio C' }
+      ];
+
+    } catch (error) {
+      console.error('Error inicial:', error);
+      this.router.navigate(['/login']);
+    }
+  }
+
+ cargarVisitas() {
+    if (!this.usuarioActual?._id) {
+      console.warn('Usuario no cargado aún, esperando...');
+      return;
+    }
+
+    this.visitaService.getVisitas().subscribe({
+      next: (visitas) => {
+        this.visitas = visitas;
+        console.log('Visitas cargadas:', visitas);
+        
+        // Cargar datos de usuarios para cada visita
+        this.cargarDatosUsuarios();
+      },
+      error: (error) => {
+        console.error('Error al cargar visitas:', error);
+        this.mostrarAlerta('Error', 'No se pudieron cargar las visitas');
+      }
+    });
+  }
 
   onQrScanned(event: {qrCode: string, coordenadas: string}) {
-    console.log('🔵 [VisitaPage] QR escaneado:', event);
+    console.log('QR escaneado:', event);
     this.nuevaVisita.qr_code = event.qrCode;
     this.nuevaVisita.coordenadas = event.coordenadas;
   }
@@ -60,13 +182,13 @@ export class VisitaPage {
     this.formSubmitted = false;
     
     if (visita) {
-      const famososArray = Array.isArray(visita.famosos_id) ? 
-        visita.famosos_id : 
-        (visita.famosos_id ? [visita.famosos_id] : []);
+      const famososArray = Array.isArray(visita.famoso_id) ? 
+        visita.famoso_id : 
+        (visita.famoso_id ? [visita.famoso_id] : []);
       
       this.nuevaVisita = { 
         ...visita, 
-        famosos_id: famososArray 
+        famoso_id: famososArray 
       };
     } else {
       this.limpiarFormulario();
@@ -83,32 +205,101 @@ export class VisitaPage {
     this.formSubmitted = true;
     
     if (this.isFormValid()) {
-      console.log('💾 [VisitaPage] Guardando visita:', this.nuevaVisita);
-      
       const visitaAGuardar = {
-        ...this.nuevaVisita,
-        fecha: new Date(),
-        // Asegurarse de que hay una imagen (usar default si no)
-        img: this.nuevaVisita.img || this.defaultImage
+        famoso_id: this.nuevaVisita.famoso_id,
+        sitio_id: this.nuevaVisita.sitio_id,
+        comentario: this.nuevaVisita.comentario.trim(),
+        img: this.nuevaVisita.img || this.defaultImage,
+        qr_code: this.nuevaVisita.qr_code || '',
+        coordenadas: this.nuevaVisita.coordenadas || ''
       };
 
-      this.visitas.push(visitaAGuardar);
-      this.cerrarFormulario();
+      console.log('Datos a guardar (limpiados):', visitaAGuardar);
+
+      if (this.nuevaVisita._id) {
+        this.visitaService.actualizarVisita(
+          this.nuevaVisita._id, 
+          visitaAGuardar,
+          this.usuarioActual?._id
+        ).subscribe({
+          next: (response) => {
+            console.log('Visita actualizada:', response);
+            this.mostrarAlerta('Éxito', 'Visita actualizada correctamente');
+            this.cargarVisitas();
+            this.cerrarFormulario();
+          },
+          error: (error) => {
+            console.error('Error al actualizar visita:', error);
+            this.mostrarAlerta('Error', 'No se pudo actualizar la visita: ' + error.message);
+          }
+        });
+      } else {
+        this.visitaService.crearVisita(visitaAGuardar).subscribe({
+          next: (response) => {
+            console.log('Visita creada:', response);
+            this.mostrarAlerta('Éxito', 'Visita creada correctamente');
+            this.cargarVisitas();
+            this.cerrarFormulario();
+          },
+          error: (error) => {
+            console.error('Error al crear visita:', error);
+            this.mostrarAlerta('Error', 'No se pudo crear la visita: ' + error.message);
+          }
+        });
+      }
+    } else {
+      console.warn('Formulario inválido');
+      this.mostrarAlerta('Error', 'Por favor completa todos los campos obligatorios');
     }
+  }
+
+  // Confirmación antes de eliminar
+  async confirmarEliminar(id: string) {
+    const alert = await this.alertController.create({
+      header: 'Confirmar eliminación',
+      message: '¿Estás seguro de que quieres eliminar esta visita?',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Eliminar',
+          role: 'confirm',
+          handler: () => {
+            this.eliminarVisita(id);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  eliminarVisita(id: string) {
+    this.visitaService.eliminarVisita(id, this.usuarioActual?._id || '').subscribe({
+      next: () => {
+        this.mostrarAlerta('Éxito', 'Visita eliminada correctamente');
+        this.cargarVisitas();
+      },
+      error: (error) => {
+        console.error('Error al eliminar visita:', error);
+        this.mostrarAlerta('Error', 'No se pudo eliminar la visita');
+      }
+    });
   }
 
   isFormValid(): boolean {
     return (
       this.nuevaVisita.comentario.trim() !== '' &&
-      this.nuevaVisita.famosos_id.length > 0 &&
-      this.nuevaVisita.sitio_id.trim() !== ''
+      this.nuevaVisita.famoso_id.length > 0 
     );
   }
 
   limpiarFormulario() {
     this.nuevaVisita = {
       _id: '',
-      famosos_id: [],
+      famoso_id: [],
       sitio_id: '',
       fecha: '',
       comentario: '',
@@ -118,68 +309,115 @@ export class VisitaPage {
     };
     this.formSubmitted = false;
   }
-async abrirMapa(coordenadas: string) {
-  console.log('🗺️ [VisitaPage] Iniciando abrirMapa con coordenadas:', coordenadas);
-  
-  // ✅ DEBUG: Verificar estado de autenticación
-  console.log('🔐 DEBUG - Verificando autenticación...');
-  
-  // Revisar si hay token en localStorage
-  const token = localStorage.getItem('token') || localStorage.getItem('authToken') || localStorage.getItem('access_token');
-  console.log('🔑 Token encontrado:', token ? 'SÍ' : 'NO');
-  
-  if (token) {
-    console.log('🔑 Token (primeros 20 chars):', token.substring(0, 20));
+
+  async abrirMapa(coordenadas: string) {
+    console.log('Abriendo mapa con coordenadas:', coordenadas);
     
-    // Verificar si el token está expirado (si es JWT)
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      const expiry = payload.exp * 1000; // Convertir a millisegundos
-      const now = Date.now();
-      console.log('⏰ Token expira:', new Date(expiry));
-      console.log('⏰ Ahora es:', new Date(now));
-      console.log('✅ Token válido:', expiry > now ? 'SÍ' : 'NO');
+      this.mostrarFormulario = false;
+      await new Promise(resolve => setTimeout(resolve, 200));
+      
+      await this.router.navigate(['/mapa'], {
+        state: { coordenadas },
+        replaceUrl: false
+      });
+      
     } catch (error) {
-      console.log('⚠️ No se pudo verificar expiración del token:', error);
+      console.error('Error al abrir mapa:', error);
+      this.mostrarAlerta('Error', 'No se pudo abrir el mapa');
     }
   }
-  
-  try {
-    // 1. Cerrar el modal primero
-    console.log('🔄 Cerrando modal...');
-    this.mostrarFormulario = false;
-    
-    // 2. Delay para asegurar que el cambio de estado se procese
-    await new Promise(resolve => setTimeout(resolve, 200));
-    
-    // 3. Navegar al mapa
-    console.log('🚀 Navegando a /mapa con coordenadas:', coordenadas);
-    
-    // ✅ TEMPORAL: Intenta sin guards primero
-    console.log('🔍 Intentando navegación...');
-    
-    await this.router.navigate(['/mapa'], {
-      state: { coordenadas },
-      replaceUrl: false
-    });
-    
-    console.log('✅ Navegación completada exitosamente');
-    
-  } catch (error) {
-    console.error('❌ Error en abrirMapa:', error);
-    
-    let errorMessage = 'No se pudo abrir el mapa.';
-    if (error instanceof Error) {
-      errorMessage += ' ' + error.message;
-    }
-    
+
+  async mostrarAlerta(titulo: string, mensaje: string) {
     const alert = await this.alertController.create({
-      header: 'Error de navegación',
-      message: errorMessage,
+      header: titulo,
+      message: mensaje,
       buttons: ['OK']
     });
     await alert.present();
   }
-}
 
+  getNombresFamosos(famosoIds: string[]): string {
+    if (!famosoIds || famosoIds.length === 0) return 'Ninguno';
+    
+    return famosoIds
+      .map(id => this.famosos.find(f => f._id === id)?.nombre || 'Desconocido')
+      .join(', ');
+  }
+
+  getNombreSitio(sitioId: string): string {
+    if (!sitioId) return 'Ninguno';
+    return this.sitios.find(s => s._id === sitioId)?.nombre || 'Desconocido';
+  }
+
+
+   
+  cargarDatosUsuarios() {
+    const usuariosIds = [...new Set(this.visitas.map(v => v.usuario_id).filter(id => id))];
+    
+    usuariosIds.forEach(userId => {
+      // Si ya tenemos los datos en caché, no hacer la petición
+      if (this.usuariosCache[userId]) {
+        return;
+      }
+
+      // Si es el usuario actual, usar sus datos
+      if (this.usuarioActual && this.usuarioActual._id === userId) {
+        this.usuariosCache[userId] = this.usuarioActual;
+        return;
+      }
+
+      // Cargar datos del usuario desde el servidor
+      this.authService.getUserById(userId).subscribe({
+        next: (usuario) => {
+          this.usuariosCache[userId] = usuario;
+        },
+        error: (error) => {
+          console.error(`Error al cargar usuario ${userId}:`, error);
+          // En caso de error, usar datos por defecto
+          this.usuariosCache[userId] = { 
+            nombre: 'Usuario desconocido', 
+            correo: 'correo@desconocido.com' 
+          };
+        }
+      });
+    });
+  }
+
+
+ getCorreoUsuario(usuarioId: string): string {
+    if (!usuarioId) return 'Sin usuario';
+    
+    // Buscar en el cache
+    const usuario = this.usuariosCache[usuarioId];
+    
+    if (usuario) {
+      return usuario.correo || 'Sin correo';
+    }
+    
+    // Si no está en caché, mostrar "Cargando..." temporalmente
+    return 'Cargando correo...';
+  }
+
+  /**
+   * Obtiene el nombre del usuario
+   * @param usuarioId ID del usuario
+   * @returns string con el nombre del usuario
+   */
+  getNombreUsuario(usuarioId: string): string {
+    if (!usuarioId) return 'Sin usuario';
+    
+    // Buscar en el cache
+    const usuario = this.usuariosCache[usuarioId];
+    
+    if (usuario) {
+      // Si es el usuario actual, mostrar "Tú"
+      if (this.usuarioActual && this.usuarioActual._id === usuarioId) {
+        return 'Tú';
+      }
+      return usuario.nombre || 'Sin nombre';
+    }
+    
+    return 'Cargando...';
+  }
 }

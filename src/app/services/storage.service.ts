@@ -6,6 +6,15 @@ import { BehaviorSubject } from 'rxjs';
   providedIn: 'root'
 })
 export class StorageService {
+  getItem(arg0: string): any {
+    throw new Error('Method not implemented.');
+  }
+  removeItem(arg0: string): any {
+    throw new Error('Method not implemented.');
+  }
+  setItem(arg0: string, arg1: string): any {
+    throw new Error('Method not implemented.');
+  }
   private _storage: Storage | null = null;
   private _initialized = false;
   private initializing: Promise<void> | null = null;

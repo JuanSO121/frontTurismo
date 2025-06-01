@@ -1,30 +1,90 @@
-.required {
-  color: var(--ion-color-danger);
+/* Estilos para el grid de cards */
+.cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 16px;
 }
 
-.invalid {
-  border: 1px solid var(--ion-color-danger);
+.visita-card {
+  margin: 0;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-5px);
+  }
 }
 
-ion-note {
-  display: block;
-  margin-top: 5px;
+.card-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
 }
 
-.image-preview {
+ion-card-header {
+  padding-bottom: 0;
+}
+
+ion-card-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+ion-card-subtitle {
   display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.9rem;
+  color: var(--ion-color-medium);
 }
 
-.preview-image {
-  max-width: 100%;
-  max-height: 200px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
+.card-comment {
+  margin: 10px 0;
+  color: var(--ion-color-dark);
+  font-size: 0.95rem;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-ion-thumbnail {
-  --size: 80px;
-  --border-radius: 8px;
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--ion-color-light-shade);
+  
+  small {
+    color: var(--ion-color-medium);
+    font-size: 0.8rem;
+  }
+}
+
+.card-actions {
+  display: flex;
+  gap: 5px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--ion-color-medium);
+  
+  ion-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+    color: var(--ion-color-primary);
+  }
+  
+  h3 {
+    margin: 10px 0 5px;
+    color: var(--ion-color-dark);
+  }
 }
