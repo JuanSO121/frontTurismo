@@ -1,36 +1,34 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>Visidtdas</ion-title>
+    <ion-title>Visitas</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <!-- Header alternativo para iOS -->
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Vidsitdas</ion-title>
+      <ion-title size="large">Visitas</ion-title>
     </ion-toolbar>
   </ion-header>
 
   <ion-list>
     <ion-item button detail (click)="abrirFormulario(visita)" *ngFor="let visita of visitas">
       <ion-label>
-        <h3>Famoso ID: {{ visita.famosos_id }}</h3>
+        <h3>Famosos: {{ visita.famosos_id.join(', ') }}</h3>
         <p>Sitio ID: {{ visita.sitio_id }}</p>
+        <p>Usuario ID: {{ visita.usuario_id }}</p>
         <p>Comentario: {{ visita.comentario }}</p>
         <small>{{ visita.fecha | date:'short' }}</small>
       </ion-label>
     </ion-item>
   </ion-list>
 
-  <!-- Botón flotante redondo -->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button (click)="abrirFormulario()">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>
 
-  <!-- Modal -->
   <ion-modal [isOpen]="mostrarFormulario" (didDismiss)="cerrarFormulario()">
     <ng-template>
       <ion-header>
@@ -55,7 +53,7 @@
           <!-- Sección QR -->
           <ion-item>
             <ion-label position="stacked">Código QR</ion-label>
-            <ion-input type="text" [(ngModel)]="nuevaVisita.qr_code" placeholder="Código escaneado" readonly></ion-input>
+            <ion-input type="text" [(ngModel)]="nuevaVisita.qr_code" readonly placeholder="Código escaneado"></ion-input>
           </ion-item>
           
           <div class="ion-padding-top">
@@ -68,7 +66,7 @@
             <ion-input type="text" [(ngModel)]="nuevaVisita.coordenadas" readonly placeholder="Se obtendrán automáticamente"></ion-input>
           </ion-item>
 
-          <!-- Vista del mapa (solo si hay coordenadas) -->
+          <!-- Vista del mapa -->
           <div *ngIf="nuevaVisita.coordenadas && nuevaVisita.coordenadas.trim() !== ''" class="ion-padding-top">
             <app-map-view 
               [coordenadas]="nuevaVisita.coordenadas" 
@@ -76,29 +74,69 @@
             </app-map-view>
           </div>
 
-          <h2>Tags</h2>
+          <h2>Datos de la Visita</h2>
 
+          <!-- Selección múltiple de famosos -->
           <ion-item>
-            <ion-label position="stacked">Famoso</ion-label>
-            <ion-select [(ngModel)]="nuevaVisita.famosos_id" interface="popover" placeholder="Selecciona un famoso">
+            <ion-label position="stacked">Famoso(s)</ion-label>
+            <ion-select 
+              [(ngModel)]="nuevaVisita.famosos_id" 
+              multiple 
+              interface="popover" 
+              placeholder="Selecciona uno o más famosos"
+              >
               <ion-select-option *ngFor="let famoso of famosos" [value]="famoso.id">
                 {{ famoso.nombre }}
               </ion-select-option>
             </ion-select>
+            
           </ion-item>
 
+          <!-- Selección de usuario -->
           <ion-item>
-            <ion-label position="stacked">Sitio</ion-label>
-            <ion-select [(ngModel)]="nuevaVisita.sitio_id" interface="popover" placeholder="Selecciona un sitio">
+            <ion-label position="stacked">Usuario <span class="required">*</span></ion-label>
+            <ion-select 
+              [(ngModel)]="nuevaVisita.usuario_id" 
+              interface="popover" 
+              placeholder="Selecciona un usuario"
+              [class.invalid]="formSubmitted && !nuevaVisita.usuario_id">
+              <ion-select-option *ngFor="let usuario of usuarios" [value]="usuario.id">
+                {{ usuario.nombre }}
+              </ion-select-option>
+            </ion-select>
+            <ion-note *ngIf="formSubmitted && !nuevaVisita.usuario_id" color="danger">
+              Debes seleccionar un usuario
+            </ion-note>
+          </ion-item>
+
+          <!-- Selección de sitio (obligatorio) -->
+          <ion-item>
+            <ion-label position="stacked">Sitio <span class="required">*</span></ion-label>
+            <ion-select 
+              [(ngModel)]="nuevaVisita.sitio_id" 
+              interface="popover" 
+              placeholder="Selecciona un sitio"
+              [class.invalid]="formSubmitted && !nuevaVisita.sitio_id">
               <ion-select-option *ngFor="let sitio of sitios" [value]="sitio.id">
                 {{ sitio.nombre }}
               </ion-select-option>
             </ion-select>
+            <ion-note *ngIf="formSubmitted && !nuevaVisita.sitio_id" color="danger">
+              Debes seleccionar un sitio
+            </ion-note>
           </ion-item>
 
+          <!-- Comentario -->
           <ion-item>
-            <ion-label position="stacked">Comentario</ion-label>
-            <ion-textarea [(ngModel)]="nuevaVisita.comentario" placeholder="Escribe un comentario..."></ion-textarea>
+            <ion-label position="stacked">Comentario <span class="required">*</span></ion-label>
+            <ion-textarea 
+              [(ngModel)]="nuevaVisita.comentario" 
+              placeholder="Escribe un comentario..."
+              [class.invalid]="formSubmitted && !nuevaVisita.comentario.trim()">
+            </ion-textarea>
+            <ion-note *ngIf="formSubmitted && !nuevaVisita.comentario.trim()" color="danger">
+              Debes escribir un comentario
+            </ion-note>
           </ion-item>
 
           <ion-button expand="block" (click)="guardarVisita()" class="ion-margin-top">
