@@ -22,12 +22,15 @@ import {
   IonTextarea,
   IonNote,
   AlertController,
-  ModalController, IonAvatar } from '@ionic/angular/standalone';
+  ModalController, 
+  IonAvatar 
+} from '@ionic/angular/standalone';
 import { QrScannerComponent } from 'src/app/components/qr-scanner/qr-scanner.component';
 import { MapViewComponent } from 'src/app/components/map-view/map-view.component';
 import { Router } from '@angular/router';
 import { VisitaService } from 'src/app/services/turismo/visitas.service';
 import { FamososService } from 'src/app/services/turismo/famosos.service';
+import { SitiosService } from 'src/app/services/turismo/sitios.service'; // Importar el servicio de sitios
 import { AuthService } from 'src/app/services/autenticacion/auth.service';
 import { IonCard } from '@ionic/angular/standalone';
 import { IonCardHeader, IonCardSubtitle, IonCardTitle } from '@ionic/angular/standalone';
@@ -40,7 +43,8 @@ import { createOutline, trashOutline, personOutline, peopleOutline, locationOutl
   templateUrl: './visita.page.html',
   styleUrls: ['./visita.page.scss'],
   standalone: true,
-  imports: [IonAvatar, 
+  imports: [
+    IonAvatar, 
     CommonModule, 
     FormsModule, 
     QrScannerComponent, 
@@ -63,7 +67,13 @@ import { createOutline, trashOutline, personOutline, peopleOutline, locationOutl
     IonSelect,
     IonSelectOption,
     IonTextarea,
-    IonNote, IonAvatar, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent
+    IonNote, 
+    IonAvatar, 
+    IonCard, 
+    IonCardHeader, 
+    IonCardTitle, 
+    IonCardSubtitle, 
+    IonCardContent
   ]
 })
 export class VisitaPage implements OnInit {
@@ -71,9 +81,8 @@ export class VisitaPage implements OnInit {
   mostrarFormulario = false;
   defaultImage = './assets/img/lugares-turisticos-de-colombia.png';
   famosos: any[] = [];
-  sitios: any[] = [];
+  sitios: any[] = []; // Ahora será poblado por el servicio
   usuariosCache: { [key: string]: any } = {}; // Cache para almacenar datos de usuarios
-
 
   nuevaVisita: any = {
     _id: '',
@@ -94,6 +103,7 @@ export class VisitaPage implements OnInit {
     private router: Router,
     private visitaService: VisitaService,
     private famososService: FamososService,
+    private sitiosService: SitiosService, // Inyectar el servicio de sitios
     private authService: AuthService,
     private alertController: AlertController
   ) {
@@ -124,10 +134,12 @@ export class VisitaPage implements OnInit {
         }
       });
 
+      // Cargar famosos
       this.famososService.getFamosos().subscribe({
         next: (response) => {
           if (response && response.ok && response.data) {
             this.famosos = response.data;
+            console.log('Famosos cargados:', this.famosos);
           } else {
             this.mostrarAlerta('Error', 'No se pudieron cargar los famosos');
           }
@@ -138,11 +150,8 @@ export class VisitaPage implements OnInit {
         }
       });
 
-      this.sitios = [
-        { _id: '1', nombre: 'Sitio A' },
-        { _id: '2', nombre: 'Sitio B' },
-        { _id: '3', nombre: 'Sitio C' }
-      ];
+      // Cargar sitios desde el servicio
+      this.cargarSitios();
 
     } catch (error) {
       console.error('Error inicial:', error);
@@ -150,7 +159,40 @@ export class VisitaPage implements OnInit {
     }
   }
 
- cargarVisitas() {
+  /**
+   * Carga la lista de sitios desde el servicio
+   */
+  cargarSitios() {
+    this.sitiosService.getSitios().subscribe({
+      next: (response) => {
+        console.log('Respuesta de sitios:', response);
+        
+        // Verificar la estructura de la respuesta
+        if (response && response.ok && response.data) {
+          this.sitios = response.data;
+        } else if (Array.isArray(response)) {
+          // En caso de que la respuesta sea directamente un array
+          this.sitios = response;
+        } else {
+          console.warn('Estructura de respuesta inesperada para sitios:', response);
+          this.sitios = [];
+        }
+        
+        console.log('Sitios cargados:', this.sitios);
+      },
+      error: (error) => {
+        console.error('Error al cargar sitios:', error);
+        this.mostrarAlerta('Error', 'No se pudieron cargar los sitios');
+        // Fallback a datos por defecto si hay error
+        this.sitios = [
+          { _id: 'default-1', nombre: 'Sitio por defecto 1' },
+          { _id: 'default-2', nombre: 'Sitio por defecto 2' }
+        ];
+      }
+    });
+  }
+
+  cargarVisitas() {
     if (!this.usuarioActual?._id) {
       console.warn('Usuario no cargado aún, esperando...');
       return;
@@ -345,13 +387,18 @@ export class VisitaPage implements OnInit {
       .join(', ');
   }
 
+  /**
+   * Obtiene el nombre del sitio por su ID
+   * @param sitioId ID del sitio
+   * @returns string con el nombre del sitio
+   */
   getNombreSitio(sitioId: string): string {
-    if (!sitioId) return 'Ninguno';
-    return this.sitios.find(s => s._id === sitioId)?.nombre || 'Desconocido';
+    if (!sitioId) return 'Sin sitio';
+    
+    const sitio = this.sitios.find(s => s._id === sitioId);
+    return sitio ? sitio.nombre : 'Sitio desconocido';
   }
 
-
-   
   cargarDatosUsuarios() {
     const usuariosIds = [...new Set(this.visitas.map(v => v.usuario_id).filter(id => id))];
     
@@ -384,8 +431,12 @@ export class VisitaPage implements OnInit {
     });
   }
 
-
- getCorreoUsuario(usuarioId: string): string {
+  /**
+   * Obtiene el correo del usuario
+   * @param usuarioId ID del usuario
+   * @returns string con el correo del usuario
+   */
+  getCorreoUsuario(usuarioId: string): string {
     if (!usuarioId) return 'Sin usuario';
     
     // Buscar en el cache
@@ -419,5 +470,27 @@ export class VisitaPage implements OnInit {
     }
     
     return 'Cargando...';
+  }
+
+  /**
+   * Método para refrescar los datos (opcional)
+   * Útil si quieres agregar un pull-to-refresh
+   */
+  async refrescarDatos(event?: any) {
+    try {
+      await Promise.all([
+        this.cargarSitios(),
+        this.cargarVisitas()
+      ]);
+      
+      if (event) {
+        event.target.complete();
+      }
+    } catch (error) {
+      console.error('Error al refrescar datos:', error);
+      if (event) {
+        event.target.complete();
+      }
+    }
   }
 }

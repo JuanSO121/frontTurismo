@@ -87,6 +87,7 @@ export class AuthService {
 
   // En auth.service.ts
 // En auth.service.ts - getCurrentUser con mejor manejo de errores
+// En auth.service.ts - getCurrentUser corregido
 getCurrentUser(): Observable<any> {
   return from(this.storageService.getCookie()).pipe(
     switchMap(token => {
@@ -95,9 +96,7 @@ getCurrentUser(): Observable<any> {
         return throwError(() => new Error('No hay token disponible'));
       }
 
-      console.log('Token encontrado:', token.substring(0, 20) + '...');
-
-      // Decodificar el token JWT directamente en el frontend
+      // Decodificar el token JWT
       try {
         const tokenParts = token.split('.');
         if (tokenParts.length !== 3) {
@@ -107,18 +106,25 @@ getCurrentUser(): Observable<any> {
         const payload = JSON.parse(atob(tokenParts[1]));
         console.log('Payload decodificado:', payload);
         
-        const usuario = {
+        // Si el payload no tiene correo, hacemos una petición al servidor
+        if (!payload.correo) {
+          return this.getUserById(payload.uid).pipe(
+            map(usuario => ({
+              _id: payload.uid,
+              nombre: payload.nombre || usuario.nombre,
+              correo: usuario.correo
+            }))
+          );
+        }
+        
+        return of({
           _id: payload.uid,  
           nombre: payload.nombre,
           correo: payload.correo
-        };
-
-        console.log('Usuario extraído:', usuario);
-        return of(usuario);
+        });
       } catch (error) {
         console.error('Error al decodificar token:', error);
-        const errorMsg = error instanceof Error ? error.message : String(error);
-        return throwError(() => new Error('Token inválido: ' + errorMsg));
+        return throwError(() => new Error('Token inválido'));
       }
     }),
     catchError(error => {
@@ -128,7 +134,6 @@ getCurrentUser(): Observable<any> {
     })
   );
 }
-
   private handleAuthError() {
     this.storageService.removeCookie()
       .then(() => this.router.navigate(['/login']))
@@ -155,18 +160,29 @@ getUserById(userId: string): Observable<any> {
       
       return this.http.get(url, { headers }).pipe(
         map((response: any) => {
-          console.log('Respuesta getUserById:', response);
-          // Ajusta según la estructura de respuesta de tu API
           if (response && response.ok && response.usuario) {
-            return response.usuario;
+            return {
+              _id: response.usuario._id,
+              nombre: response.usuario.nombre,
+              correo: response.usuario.correo
+            };
           } else if (response && response.data) {
-            return response.data;
+            return {
+              _id: response.data._id,
+              nombre: response.data.nombre,
+              correo: response.data.correo
+            };
           }
-          return response;
+          throw new Error('Formato de respuesta no válido');
         }),
         catchError(error => {
           console.error(`Error al obtener usuario ${userId}:`, error);
-          return throwError(() => error);
+          // Devuelve un objeto con datos por defecto en caso de error
+          return of({ 
+            _id: userId,
+            nombre: 'Usuario desconocido',
+            correo: 'correo@desconocido.com'
+          });
         })
       );
     })
