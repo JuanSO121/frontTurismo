@@ -42,18 +42,19 @@ import {
   heart,
   locationOutline,
   globeOutline,
-  personOutline
+  homeOutline,
+  mapOutline
 } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
-import { Famoso, Pais } from 'src/app/interfaces/turismo.interfac';
-import { FamososService } from 'src/app/services/turismo/famosos.service';
+import { Sitio, Pais } from 'src/app/interfaces/turismo.interfac';
+import { SitiosService } from 'src/app/services/turismo/sitios.service';
 import { PaisesService } from 'src/app/services/turismo/paises.service';
 import { FavoriteService } from 'src/app/services/favoritos/favorite.service';
 
 @Component({
-  selector: 'app-gallery',
-  templateUrl: './gallery.component.html',
-  styleUrls: ['./gallery.component.scss'],
+  selector: 'app-sitios',
+  templateUrl: './sitios.component.html',
+  styleUrls: ['./sitios.component.scss'],
   standalone: true,
   imports: [
     IonSearchbar,
@@ -82,24 +83,24 @@ import { FavoriteService } from 'src/app/services/favoritos/favorite.service';
     IonBadge
   ]
 })
-export class GalleryComponent implements OnInit {
-  @Input() title: string = 'Galería de Famosos';
+export class SitiosComponent implements OnInit {
+  @Input() title: string = 'Galería de Sitios Turísticos';
   
   // Datos principales
   paises: Pais[] = [];
   ciudades: string[] = [];
-  famososDelPais: Famoso[] = []; // Todos los famosos del país seleccionado
-  famososFiltrados: Famoso[] = []; // Famosos filtrados por ciudad (si se selecciona)
-  famososMostrados: Famoso[] = []; // Los famosos que se muestran actualmente
+  sitiosDelPais: Sitio[] = []; // Todos los sitios del país seleccionado
+  sitiosFiltrados: Sitio[] = []; // Sitios filtrados por ciudad (si se selecciona)
+  sitiosMostrados: Sitio[] = []; // Los sitios que se muestran actualmente
   
   // Selecciones actuales
   selectedPais: Pais | null = null;
   selectedCiudad: string = ''; // Vacío significa "todas las ciudades"
-  selectedFamoso: Famoso | null = null;
+  selectedSitio: Sitio | null = null;
   
   // Modal properties
   isModalOpen: boolean = false;
-  selectedFamosoForModal: Famoso | null = null;
+  selectedSitioForModal: Sitio | null = null;
 
   // Toast properties
   isToastOpen: boolean = false;
@@ -110,7 +111,7 @@ export class GalleryComponent implements OnInit {
   defaultImage: string = 'assets/img/no-image.png';
 
   constructor(
-    private famososService: FamososService,
+    private sitiosService: SitiosService,
     private paisesService: PaisesService,
     private favoriteService: FavoriteService,
     private alertController: AlertController,
@@ -130,7 +131,8 @@ export class GalleryComponent implements OnInit {
       heart,
       locationOutline,
       globeOutline,
-      personOutline
+      homeOutline,
+      mapOutline
     });
   }
 
@@ -170,10 +172,10 @@ export class GalleryComponent implements OnInit {
     
     // Reset selections
     this.selectedCiudad = '';
-    this.selectedFamoso = null;
-    this.famososDelPais = [];
-    this.famososFiltrados = [];
-    this.famososMostrados = [];
+    this.selectedSitio = null;
+    this.sitiosDelPais = [];
+    this.sitiosFiltrados = [];
+    this.sitiosMostrados = [];
     this.ciudades = [];
     
     if (!paisId) {
@@ -184,52 +186,52 @@ export class GalleryComponent implements OnInit {
     this.selectedPais = this.paises.find(pais => pais._id === paisId) || null;
     
     if (this.selectedPais) {
-      await this.loadFamososByPais(this.selectedPais.nombre);
+      await this.loadSitiosByPais(this.selectedPais.nombre);
     }
   }
 
-  async loadFamososByPais(paisNombre: string) {
-    const loading = await this.presentLoading('Cargando famosos del país...');
+  async loadSitiosByPais(paisNombre: string) {
+    const loading = await this.presentLoading('Cargando sitios del país...');
     
     try {
-      this.famososService.getFamososByPais(paisNombre).subscribe({
+      this.sitiosService.getSitiosByPais(paisNombre).subscribe({
         next: (response) => {
           if (response && response.ok && response.data) {
-            this.famososDelPais = response.data;
-            // Mostrar TODOS los famosos del país inicialmente
-            this.famososMostrados = [...this.famososDelPais];
-            // Extraer ciudades únicas de los famosos del país
-            this.extractCiudadesFromFamosos(this.famososDelPais);
-            console.log('Famosos del país cargados:', this.famososDelPais);
+            this.sitiosDelPais = response.data;
+            // Mostrar TODOS los sitios del país inicialmente
+            this.sitiosMostrados = [...this.sitiosDelPais];
+            // Extraer ciudades únicas de los sitios del país
+            this.extractCiudadesFromSitios(this.sitiosDelPais);
+            console.log('Sitios del país cargados:', this.sitiosDelPais);
             console.log('Ciudades disponibles:', this.ciudades);
           } else {
             console.error('Formato de respuesta inesperado:', response);
-            this.famososDelPais = [];
-            this.famososMostrados = [];
+            this.sitiosDelPais = [];
+            this.sitiosMostrados = [];
             this.ciudades = [];
           }
           loading.dismiss();
         },
         error: (error) => {
-          console.error('Error al cargar famosos del país:', error);
-          this.presentAlert('Error', 'No se pudieron cargar los famosos del país');
-          this.famososDelPais = [];
-          this.famososMostrados = [];
+          console.error('Error al cargar sitios del país:', error);
+          this.presentAlert('Error', 'No se pudieron cargar los sitios del país');
+          this.sitiosDelPais = [];
+          this.sitiosMostrados = [];
           this.ciudades = [];
           loading.dismiss();
         }
       });
     } catch (error) {
-      console.error('Error en la carga de famosos del país:', error);
+      console.error('Error en la carga de sitios del país:', error);
       loading.dismiss();
     }
   }
 
-  private extractCiudadesFromFamosos(famosos: Famoso[]) {
-    // Extraer ciudades únicas de los famosos
+  private extractCiudadesFromSitios(sitios: Sitio[]) {
+    // Extraer ciudades únicas de los sitios
     const ciudadesUnicas = [...new Set(
-      famosos
-        .map((f: Famoso) => f.ciudad)
+      sitios
+        .map((s: Sitio) => s.ciudad)
         .filter((ciudad): ciudad is string => 
           typeof ciudad === 'string' && ciudad.trim() !== ''
         )
@@ -242,47 +244,47 @@ export class GalleryComponent implements OnInit {
     this.selectedCiudad = selectElement.value;
     
     if (!this.selectedCiudad) {
-      // Si no hay ciudad seleccionada, mostrar TODOS los famosos del país
-      this.famososMostrados = [...this.famososDelPais];
+      // Si no hay ciudad seleccionada, mostrar TODOS los sitios del país
+      this.sitiosMostrados = [...this.sitiosDelPais];
     } else {
-      // Filtrar famosos por la ciudad seleccionada
-      this.famososMostrados = this.famososDelPais.filter(famoso => famoso.ciudad === this.selectedCiudad);
+      // Filtrar sitios por la ciudad seleccionada
+      this.sitiosMostrados = this.sitiosDelPais.filter(sitio => sitio.ciudad === this.selectedCiudad);
     }
     
-    console.log('Famosos mostrados:', this.famososMostrados);
+    console.log('Sitios mostrados:', this.sitiosMostrados);
   }
 
-  // Método para abrir el modal con información del famoso
-  openFamosoModal(famoso: Famoso) {
-    this.selectedFamosoForModal = famoso;
+  // Método para abrir el modal con información del sitio
+  openSitioModal(sitio: Sitio) {
+    this.selectedSitioForModal = sitio;
     this.isModalOpen = true;
   }
 
   closeModal() {
     this.isModalOpen = false;
-    this.selectedFamosoForModal = null;
+    this.selectedSitioForModal = null;
   }
 
-  async toggleFavorite(famoso: Famoso) {
-    if (!famoso._id) {
+  async toggleFavorite(sitio: Sitio) {
+    if (!sitio._id) {
       return;
     }
 
     try {
-      const isFavorite = this.favoriteService.isFavorite(famoso._id, 0); // Usando 0 como índice por ser una sola imagen
+      const isFavorite = this.favoriteService.isFavorite(sitio._id, 0); // Usando 0 como índice por ser una sola imagen
       
       if (isFavorite) {
-        const success = await this.favoriteService.removeFromFavorites(famoso._id, 0);
+        const success = await this.favoriteService.removeFromFavorites(sitio._id, 0);
         if (success) {
-          this.showToast('Famoso eliminado de favoritos', 'warning');
+          this.showToast('Sitio eliminado de favoritos', 'warning');
         }
       } else {
-        const imageUrl = this.getFamosoImageUrl(famoso);
-        const success = await this.favoriteService.addToFavorites(famoso._id, famoso.nombre, imageUrl, 0);
+        const imageUrl = this.getSitioImageUrl(sitio);
+        const success = await this.favoriteService.addToFavorites(sitio._id, sitio.nombre, imageUrl, 0);
         if (success) {
-          this.showToast('Famoso agregado a favoritos', 'success');
+          this.showToast('Sitio agregado a favoritos', 'success');
         } else {
-          this.showToast('El famoso ya está en favoritos', 'primary');
+          this.showToast('El sitio ya está en favoritos', 'primary');
         }
       }
     } catch (error) {
@@ -291,21 +293,21 @@ export class GalleryComponent implements OnInit {
     }
   }
 
-  isFavorite(famoso: Famoso): boolean {
-    if (!famoso._id) {
+  isFavorite(sitio: Sitio): boolean {
+    if (!sitio._id) {
       return false;
     }
-    return this.favoriteService.isFavorite(famoso._id, 0);
+    return this.favoriteService.isFavorite(sitio._id, 0);
   }
 
-  getFamosoImageUrl(famoso: Famoso): string {
-    if (famoso.img) {
+  getSitioImageUrl(sitio: Sitio): string {
+    if (sitio.img) {
       // Si img es un array, tomar la primera imagen
-      if (Array.isArray(famoso.img)) {
-        return famoso.img[0] || this.defaultImage;
+      if (Array.isArray(sitio.img)) {
+        return sitio.img[0] || this.defaultImage;
       }
       // Si img es un string
-      return famoso.img;
+      return sitio.img;
     }
     return this.defaultImage;
   }

@@ -1,0 +1,155 @@
+<ion-card>
+  <ion-card-header>
+    <ion-card-title class="ranking-title">
+      <ion-icon name="trophy-outline" color="warning"></ion-icon>
+      {{ title }}
+    </ion-card-title>
+  </ion-card-header>
+  <ion-card-content>
+    <!-- Selector de País -->
+    <ion-item>
+      <ion-label position="stacked">Seleccionar País</ion-label>
+      @if (isLoadingPaises) {
+        <ion-skeleton-text animated style="width: 100%; height: 40px;"></ion-skeleton-text>
+      } @else {
+        <ion-select placeholder="Selecciona un país para ver su ranking" (ionChange)="paisSelected($event)">
+          <ion-select-option *ngFor="let pais of paises" [value]="pais._id">
+            {{ pais.nombre }}
+          </ion-select-option>
+        </ion-select>
+      }
+    </ion-item>
+  </ion-card-content>
+</ion-card>
+
+<!-- Loading Top 10 -->
+@if (isLoadingTop10) {
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>
+        <ion-skeleton-text animated style="width: 60%;"></ion-skeleton-text>
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-grid>
+        <ion-row>
+          @for (item of [1,2,3,4,5]; track item) {
+            <ion-col size="12" class="ranking-item-skeleton">
+              <div class="ranking-card-skeleton">
+                <ion-skeleton-text animated style="width: 60px; height: 60px; border-radius: 50%;"></ion-skeleton-text>
+                <div class="skeleton-content">
+                  <ion-skeleton-text animated style="width: 70%;"></ion-skeleton-text>
+                  <ion-skeleton-text animated style="width: 50%;"></ion-skeleton-text>
+                  <ion-skeleton-text animated style="width: 40%;"></ion-skeleton-text>
+                </div>
+              </div>
+            </ion-col>
+          }
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+}
+
+<!-- Ranking Top 10 -->
+@if (selectedPais && top10Sitios.length > 0 && !isLoadingTop10) {
+  <ion-card class="ranking-card">
+    <ion-card-header>
+      <ion-card-title class="ranking-header">
+        <div class="ranking-title-container">
+          <ion-icon name="flame-outline" color="danger"></ion-icon>
+          <span>Top {{ top10Sitios.length }} - {{ selectedPais.nombre }}</span>
+        </div>
+        <ion-badge color="primary" class="ranking-badge">
+          <ion-icon name="eye-outline"></ion-icon>
+          Más Visitados
+        </ion-badge>
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-grid>
+        <ion-row>
+          @for (sitio of top10Sitios; track sitio._id; let i = $index) {
+            <ion-col size="12" class="ranking-item-col">
+              <div class="ranking-item" [class.top-three]="i < 3">
+                <ion-ripple-effect></ion-ripple-effect>
+                
+                <!-- Posición y Medalla -->
+                <div class="ranking-position">
+                  <div class="position-circle">> <!-- [color]="getRankingColor(i + 1)"> -->
+                    <ion-icon [name]="getRankingIcon(i + 1)" [color]="getRankingColor(i + 1)"></ion-icon>
+                    <span class="position-number">{{ i + 1 }}</span>
+                  </div>
+                </div>
+
+                <!-- Imagen del Sitio -->
+                <div class="sitio-image-container">
+                  <img [src]="getSitioImageUrl(sitio)" 
+                       (error)="handleImageError($event)" 
+                       [alt]="sitio.nombre" 
+                       class="sitio-thumbnail">
+                  <div class="image-overlay"></div>
+                </div>
+
+                <!-- Información del Sitio -->
+                <div class="sitio-info">
+                  <h3 class="sitio-name">{{ sitio.nombre }}</h3>
+                  <div class="sitio-details">
+                    <ion-chip size="small" [color]="getRankingColor(i + 1)" outline>
+                      <ion-icon name="business-outline"></ion-icon>
+                      <ion-label>{{ sitio.tipo }}</ion-label>
+                    </ion-chip>
+                    @if (sitio.ciudad) {
+                      <ion-chip size="small" color="secondary" outline>
+                        <ion-icon name="location-outline"></ion-icon>
+                        <ion-label>{{ sitio.ciudad }}</ion-label>
+                      </ion-chip>
+                    }
+                  </div>
+                  @if (sitio.descripcion) {
+                    <p class="sitio-description">{{ sitio.descripcion | slice:0:80 }}@if (sitio.descripcion.length > 80) {&hellip;}</p>
+                  }
+                </div>
+
+                <!-- Acciones -->
+                <div class="sitio-actions">
+                  <ion-button fill="clear" [color]="isFavorite(sitio) ? 'danger' : 'medium'" (click)="toggleFavorite(sitio)">
+                    <ion-icon [name]="isFavorite(sitio) ? 'heart' : 'heart-outline'"></ion-icon>
+                  </ion-button>
+                </div>
+              </div>
+            </ion-col>
+          }
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+}
+
+<!-- Estado Vacío - País Seleccionado pero Sin Datos -->
+@if (selectedPais && top10Sitios.length === 0 && !isLoadingTop10) {
+  <ion-card>
+    <ion-card-content class="ion-text-center ion-padding empty-state">
+      <ion-icon name="trophy-outline" size="large" color="medium"></ion-icon>
+      <h3>Sin Datos de Visitantes</h3>
+      <p>No hay información de sitios visitados en <strong>{{ selectedPais.nombre }}</strong>.</p>
+      <p class="empty-subtitle">Los sitios necesitan registro de visitas para aparecer en el ranking.</p>
+    </ion-card-content>
+  </ion-card>
+}
+
+<!-- Estado Inicial -->
+@if (!selectedPais && !isLoadingPaises) {
+  <ion-card>
+    <ion-card-content class="ion-text-center ion-padding empty-state">
+      <ion-icon name="globe-outline" size="large" color="primary"></ion-icon>
+      <h3>Descubre los Sitios Más Populares</h3>
+      <p>Selecciona un país para ver el ranking de sus sitios turísticos más visitados.</p>
+      <ion-chip color="primary" outline>
+        <ion-icon name="star-outline"></ion-icon>
+        <ion-label>Rankings Actualizados</ion-label>
+      </ion-chip>
+    </ion-card-content>
+  </ion-card>
+}
+

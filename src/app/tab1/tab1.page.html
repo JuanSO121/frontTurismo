@@ -1,40 +1,19 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-title>Iniciar Sesión</ion-title>
+    <ion-title>Famosos del Mundo</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <div class="login-container">
-    <h2>Bienvenido</h2>
-    <p class="subtitle">Accede a tu cuenta para administrar héroes</p>
+<ion-content>
+ <app-sitios 
+    title="Descubre las celebridades de tu pais favorito"
+    selectLabel="Seleccionar Famoso"
+    selectPlaceholder="Seleccione un Famoso">
+  </app-sitios> 
 
-    <form (ngSubmit)="login()">
-      <ion-item>
-        <ion-label position="floating">Correo electrónico</ion-label>
-        <ion-input type="email" [(ngModel)]="user" name="email" required></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="floating">Contraseña</ion-label>
-        <ion-input type="password" [(ngModel)]="password" name="password" required></ion-input>
-      </ion-item>
-
-      <ion-text color="danger" *ngIf="err">
-        <p class="error-message">{{ err }}</p>
-      </ion-text>
-
-      <ion-button expand="block" type="submit" [disabled]="isLoading" class="ion-margin-top">
-        <ion-spinner name="circles" *ngIf="isLoading"></ion-spinner>
-        <span *ngIf="!isLoading">Iniciar Sesión</span>
-      </ion-button>
-    </form>
-  </div>
-
-  <ion-toast
-    [isOpen]="isToastOpen"
-    [message]="toastMessage"
-    [duration]="3000"
-    (didDismiss)="setToastOpen(false)"
-  ></ion-toast>
+   <app-top10-sitios 
+    title="Descubre las celebridades de tu pais favorito"
+    selectLabel="Seleccionar Famoso"
+    selectPlaceholder="Seleccione un Famoso">
+  </app-top10-sitios>
 </ion-content>

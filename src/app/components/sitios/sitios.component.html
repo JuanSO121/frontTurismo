@@ -28,48 +28,48 @@
   </ion-card-content>
 </ion-card>
 
-<!-- Galería de Famosos -->
-@if (selectedPais && famososMostrados.length > 0) {
+<!-- Galería de Sitios -->
+@if (selectedPais && sitiosMostrados.length > 0) {
   <ion-card>
     <ion-card-header>
       <ion-card-title>
-        Famosos de {{ selectedPais.nombre }}
+        Sitios Turísticos de {{ selectedPais.nombre }}
         @if (selectedCiudad) {
           <span> - {{ selectedCiudad }}</span>
         }
-        <ion-badge color="primary" class="ion-margin-start">{{ famososMostrados.length }}</ion-badge>
+        <ion-badge color="primary" class="ion-margin-start">{{ sitiosMostrados.length }}</ion-badge>
       </ion-card-title>
     </ion-card-header>
     <ion-card-content>
       <ion-grid>
         <ion-row>
-          @for (famoso of famososMostrados; track famoso._id) {
+          @for (sitio of sitiosMostrados; track sitio._id) {
             <ion-col size="6" size-md="4" size-lg="3" class="ion-margin-bottom">
-              <div class="famoso-card" (click)="openFamosoModal(famoso)">
-                <div class="famoso-image-container">
-                  <img [src]="getFamosoImageUrl(famoso)" 
+              <div class="sitio-card" (click)="openSitioModal(sitio)">
+                <div class="sitio-image-container">
+                  <img [src]="getSitioImageUrl(sitio)" 
                        (error)="handleImageError($event)" 
-                       [alt]="famoso.nombre" 
-                       class="famoso-image">
+                       [alt]="sitio.nombre" 
+                       class="sitio-image">
                   <div class="image-overlay">
                     <ion-icon name="information-circle-outline" class="info-icon"></ion-icon>
                   </div>
-                  <div class="famoso-actions" (click)="$event.stopPropagation()">
-                    <ion-button fill="clear" [color]="isFavorite(famoso) ? 'danger' : 'medium'" (click)="toggleFavorite(famoso)">
-                      <ion-icon [name]="isFavorite(famoso) ? 'heart' : 'heart-outline'"></ion-icon>
+                  <div class="sitio-actions" (click)="$event.stopPropagation()">
+                    <ion-button fill="clear" [color]="isFavorite(sitio) ? 'danger' : 'medium'" (click)="toggleFavorite(sitio)">
+                      <ion-icon [name]="isFavorite(sitio) ? 'heart' : 'heart-outline'"></ion-icon>
                     </ion-button>
                   </div>
                 </div>
-                <div class="famoso-info">
-                  <h3 class="famoso-name">{{ famoso.nombre }}</h3>
-                  <div class="famoso-details">
+                <div class="sitio-info">
+                  <h3 class="sitio-name">{{ sitio.nombre }}</h3>
+                  <div class="sitio-details">
                     <ion-chip color="primary" size="small">
-                      <ion-icon name="person-outline"></ion-icon>
-                      <ion-label>{{ famoso.categoria }}</ion-label>
+                      <ion-icon name="business-outline"></ion-icon>
+                      <ion-label>{{ sitio.tipo }}</ion-label>
                     </ion-chip>
                     <ion-chip color="secondary" size="small">
                       <ion-icon name="location-outline"></ion-icon>
-                      <ion-label>{{ famoso.ciudad }}</ion-label>
+                      <ion-label>{{ sitio.ciudad }}</ion-label>
                     </ion-chip>
                   </div>
                 </div>
@@ -80,19 +80,19 @@
       </ion-grid>
     </ion-card-content>
   </ion-card>
-} @else if (selectedPais && famososMostrados.length === 0 && famososDelPais.length > 0) {
+} @else if (selectedPais && sitiosMostrados.length === 0 && sitiosDelPais.length > 0) {
   <ion-card>
     <ion-card-content class="ion-text-center ion-padding">
       <ion-icon name="location-outline" size="large" color="medium"></ion-icon>
-      <p>No hay famosos en la ciudad "{{ selectedCiudad }}".</p>
-      <p>Selecciona "Todas las ciudades" para ver todos los famosos del país.</p>
+      <p>No hay sitios turísticos en la ciudad "{{ selectedCiudad }}".</p>
+      <p>Selecciona "Todas las ciudades" para ver todos los sitios del país.</p>
     </ion-card-content>
   </ion-card>
-} @else if (selectedPais && famososDelPais.length === 0) {
+} @else if (selectedPais && sitiosDelPais.length === 0) {
   <ion-card>
     <ion-card-content class="ion-text-center ion-padding">
-      <ion-icon name="person-outline" size="large" color="medium"></ion-icon>
-      <p>No hay famosos registrados en {{ selectedPais.nombre }}.</p>
+      <ion-icon name="map-outline" size="large" color="medium"></ion-icon>
+      <p>No hay sitios turísticos registrados en {{ selectedPais.nombre }}.</p>
     </ion-card-content>
   </ion-card>
 }
@@ -101,17 +101,17 @@
   <ion-card>
     <ion-card-content class="ion-text-center ion-padding">
       <ion-icon name="globe-outline" size="large" color="medium"></ion-icon>
-      <p>Selecciona un país para ver la galería de famosos.</p>
+      <p>Selecciona un país para ver la galería de sitios turísticos.</p>
     </ion-card-content>
   </ion-card>
 }
 
-<!-- Modal de información del famoso -->
+<!-- Modal de información del sitio -->
 <ion-modal [isOpen]="isModalOpen" (didDismiss)="closeModal()">
   <ng-template>
     <ion-header class="modal-header">
       <ion-toolbar color="dark">
-        <ion-title class="modal-title">{{ selectedFamosoForModal?.nombre }}</ion-title>
+        <ion-title class="modal-title">{{ selectedSitioForModal?.nombre }}</ion-title>
         <ion-button slot="end" fill="clear" color="light" (click)="closeModal()">
           <ion-icon name="close-outline"></ion-icon>
         </ion-button>
@@ -119,38 +119,38 @@
     </ion-header>
     
     <ion-content class="modal-content">
-      @if (selectedFamosoForModal) {
-        <div class="famoso-modal-container">
+      @if (selectedSitioForModal) {
+        <div class="sitio-modal-container">
           <!-- Imagen principal -->
-          <div class="famoso-image-section">
+          <div class="sitio-image-section">
             <div class="main-image-container">
-              <img [src]="getFamosoImageUrl(selectedFamosoForModal)" 
+              <img [src]="getSitioImageUrl(selectedSitioForModal)" 
                    (error)="handleImageError($event)" 
-                   [alt]="selectedFamosoForModal.nombre" 
-                   class="main-famoso-image">
+                   [alt]="selectedSitioForModal.nombre" 
+                   class="main-sitio-image">
               <div class="image-gradient-overlay"></div>
               <!-- Botón de favorito en el modal -->
-              <div class="modal-favorite-button" (click)="toggleFavorite(selectedFamosoForModal)">
-                <ion-button fill="solid" [color]="isFavorite(selectedFamosoForModal) ? 'danger' : 'light'" size="small">
-                  <ion-icon [name]="isFavorite(selectedFamosoForModal) ? 'heart' : 'heart-outline'"></ion-icon>
+              <div class="modal-favorite-button" (click)="toggleFavorite(selectedSitioForModal)">
+                <ion-button fill="solid" [color]="isFavorite(selectedSitioForModal) ? 'danger' : 'light'" size="small">
+                  <ion-icon [name]="isFavorite(selectedSitioForModal) ? 'heart' : 'heart-outline'"></ion-icon>
                 </ion-button>
               </div>
             </div>
           </div>
 
-          <!-- Información del famoso -->
-          <div class="famoso-info-section">
-            <div class="famoso-header">
-              <h1 class="famoso-name">{{ selectedFamosoForModal.nombre }}</h1>
-              <div class="famoso-badges">
-                <ion-chip color="primary" class="categoria-chip">
-                  <ion-icon name="person-outline"></ion-icon>
-                  <ion-label>{{ selectedFamosoForModal.categoria }}</ion-label>
+          <!-- Información del sitio -->
+          <div class="sitio-info-section">
+            <div class="sitio-header">
+              <h1 class="sitio-name">{{ selectedSitioForModal.nombre }}</h1>
+              <div class="sitio-badges">
+                <ion-chip color="primary" class="tipo-chip">
+                  <ion-icon name="business-outline"></ion-icon>
+                  <ion-label>{{ selectedSitioForModal.tipo }}</ion-label>
                 </ion-chip>
-                @if (selectedFamosoForModal.ciudad) {
+                @if (selectedSitioForModal.ciudad) {
                   <ion-chip color="secondary" class="ciudad-chip">
                     <ion-icon name="location-outline"></ion-icon>
-                    <ion-label>{{ selectedFamosoForModal.ciudad }}</ion-label>
+                    <ion-label>{{ selectedSitioForModal.ciudad }}</ion-label>
                   </ion-chip>
                 }
                 @if (selectedPais) {
@@ -159,7 +159,13 @@
                     <ion-label>{{ selectedPais.nombre }}</ion-label>
                   </ion-chip>
                 }
-                @if (isFavorite(selectedFamosoForModal)) {
+                @if (selectedSitioForModal.direccion) {
+                  <ion-chip color="medium" class="direccion-chip">
+                    <ion-icon name="map-outline"></ion-icon>
+                    <ion-label>{{ selectedSitioForModal.direccion }}</ion-label>
+                  </ion-chip>
+                }
+                @if (isFavorite(selectedSitioForModal)) {
                   <ion-chip color="danger" class="favorite-chip">
                     <ion-icon name="heart"></ion-icon>
                     <ion-label>Favorito</ion-label>
@@ -168,27 +174,33 @@
               </div>
             </div>
 
-            <div class="famoso-bio-section">
+            <div class="sitio-bio-section">
               <h3 class="bio-title">
                 <ion-icon name="information-circle-outline"></ion-icon>
                 Descripción
               </h3>
-              <p class="famoso-bio">{{ selectedFamosoForModal.descripcion || 'No hay descripción disponible para este famoso.' }}</p>
+              <p class="sitio-bio">{{ selectedSitioForModal.descripcion || 'No hay descripción disponible para este sitio turístico.' }}</p>
             </div>
 
-            <div class="famoso-stats">
+            <div class="sitio-stats">
               <div class="stat-item">
-                <span class="stat-label">Categoría</span>
-                <ion-badge color="primary" class="stat-value">{{ selectedFamosoForModal.categoria }}</ion-badge>
+                <span class="stat-label">Tipo</span>
+                <ion-badge color="primary" class="stat-value">{{ selectedSitioForModal.tipo }}</ion-badge>
               </div>
               <div class="stat-item">
                 <span class="stat-label">Ciudad</span>
-                <ion-badge color="secondary" class="stat-value">{{ selectedFamosoForModal.ciudad }}</ion-badge>
+                <ion-badge color="secondary" class="stat-value">{{ selectedSitioForModal.ciudad }}</ion-badge>
               </div>
               @if (selectedPais) {
                 <div class="stat-item">
                   <span class="stat-label">País</span>
                   <ion-badge color="tertiary" class="stat-value">{{ selectedPais.nombre }}</ion-badge>
+                </div>
+              }
+              @if (selectedSitioForModal.direccion) {
+                <div class="stat-item">
+                  <span class="stat-label">Dirección</span>
+                  <ion-badge color="medium" class="stat-value">{{ selectedSitioForModal.direccion }}</ion-badge>
                 </div>
               }
             </div>

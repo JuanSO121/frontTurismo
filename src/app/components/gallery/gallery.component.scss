@@ -1,113 +1,349 @@
-.image-container {
-  position: relative;
-  border-radius: 12px;
+// ===== VARIABLES DE COLOR Y DISEÑO =====
+:host {
+  --gallery-primary: #6366f1;
+  --gallery-secondary: #8b5cf6;
+  --gallery-accent: #06b6d4;
+  --gallery-success: #10b981;
+  --gallery-warning: #f59e0b;
+  --gallery-danger: #ef4444;
+  --gallery-dark: #1f2937;
+  --gallery-light: #f8fafc;
+  --gallery-white: #ffffff;
+  --gallery-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --gallery-shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --gallery-border-radius: 16px;
+  --gallery-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --gallery-gradient: linear-gradient(135deg, var(--gallery-primary) 0%, var(--gallery-secondary) 100%);
+}
+
+// ===== ESTILOS GENERALES =====
+.gallery-container {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+// ===== CARDS PRINCIPALES =====
+ion-card {
+  border-radius: var(--gallery-border-radius);
+  box-shadow: var(--gallery-shadow);
+  margin: 1rem 0;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
-  cursor: pointer;
+  background: var(--gallery-white);
+  transition: var(--gallery-transition);
+  border: none;
 
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+    box-shadow: var(--gallery-shadow-lg);
   }
 
-  .character-img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    display: block;
-    transition: transform 0.3s ease;
-  }
+  ion-card-header {
+    background: var(--gallery-gradient);
+    color: var(--gallery-white);
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
 
-  .image-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s ease;
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.1)"/><circle cx="10" cy="50" r="0.5" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+      opacity: 0.3;
+      animation: float 20s ease-in-out infinite;
+    }
 
-    .info-icon {
-      font-size: 2rem;
-      color: white;
+    ion-card-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      position: relative;
+      z-index: 1;
     }
   }
 
-  .image-actions {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    z-index: 10;
-  }
-
-  &:hover .image-overlay,
-  &:hover .image-actions {
-    opacity: 1;
-  }
-
-  &:hover .character-img {
-    transform: scale(1.05);
+  ion-card-content {
+    padding: 1.5rem;
+    background: var(--gallery-white);
   }
 }
 
-ion-card {
-  margin: 16px;
+// ===== SELECTORES ESTILIZADOS =====
+ion-item {
+  --background: transparent;
+  --border-color: rgba(99, 102, 241, 0.2);
+  --border-radius: 12px;
+  --padding-start: 0;
+  --padding-end: 0;
+  margin: 1rem 0;
+  border-radius: 12px;
+  background: rgba(99, 102, 241, 0.05);
+  backdrop-filter: blur(10px);
+  transition: var(--gallery-transition);
+
+  &:hover {
+    --background: rgba(99, 102, 241, 0.1);
+    transform: translateX(4px);
+  }
+
+  ion-label {
+    font-weight: 600;
+    color: var(--gallery-dark);
+    margin-bottom: 0.5rem;
+  }
+
+  ion-select {
+    --padding-start: 1rem;
+    --padding-end: 1rem;
+    font-weight: 500;
+    
+    &::part(text) {
+      color: var(--gallery-dark);
+    }
+  }
 }
 
-ion-button {
-  --border-radius: 8px;
+// ===== GALERÍA DE FAMOSOS =====
+.famoso-card {
+  background: var(--gallery-white);
+  border-radius: var(--gallery-border-radius);
+  box-shadow: var(--gallery-shadow);
+  overflow: hidden;
+  transition: var(--gallery-transition);
+  cursor: pointer;
+  height: 320px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+
+  &:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: var(--gallery-shadow-lg);
+
+    .image-overlay {
+      opacity: 1;
+    }
+
+    .famoso-image {
+      transform: scale(1.1);
+    }
+
+    .famoso-actions {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  &:active {
+    transform: translateY(-4px) scale(1.01);
+  }
 }
 
-.ion-text-center p {
-  color: var(--ion-color-medium);
-  font-size: 0.9rem;
+.famoso-image-container {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+  background: linear-gradient(45deg, #f0f2f5 25%, transparent 25%), 
+              linear-gradient(-45deg, #f0f2f5 25%, transparent 25%), 
+              linear-gradient(45deg, transparent 75%, #f0f2f5 75%), 
+              linear-gradient(-45deg, transparent 75%, #f0f2f5 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
 }
 
-// Modal Styles
+.famoso-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: var(--gallery-transition);
+  filter: brightness(1.1) contrast(1.05);
+}
+
+.image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, 
+    rgba(99, 102, 241, 0.8) 0%, 
+    rgba(139, 92, 246, 0.8) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: var(--gallery-transition);
+
+  .info-icon {
+    font-size: 2.5rem;
+    color: var(--gallery-white);
+    animation: pulse 2s infinite;
+  }
+}
+
+.famoso-actions {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: var(--gallery-transition);
+  z-index: 10;
+
+  ion-button {
+    --border-radius: 50%;
+    --box-shadow: var(--gallery-shadow);
+    --background: rgba(255, 255, 255, 0.95);
+    --color: var(--gallery-danger);
+    backdrop-filter: blur(10px);
+    width: 40px;
+    height: 40px;
+
+    &:hover {
+      --background: var(--gallery-white);
+      transform: scale(1.1);
+    }
+
+    ion-icon {
+      font-size: 1.2rem;
+    }
+  }
+}
+
+.famoso-info {
+  padding: 1rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: var(--gallery-white);
+}
+
+.famoso-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem 0;
+  color: var(--gallery-dark);
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.famoso-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+
+  ion-chip {
+    --background: rgba(99, 102, 241, 0.1);
+    --color: var(--gallery-primary);
+    font-size: 0.75rem;
+    font-weight: 600;
+    height: auto;
+    padding: 4px 8px;
+
+    &[color="secondary"] {
+      --background: rgba(139, 92, 246, 0.1);
+      --color: var(--gallery-secondary);
+    }
+
+    ion-icon {
+      font-size: 0.9rem;
+      margin-right: 0.25rem;
+    }
+
+    ion-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+  }
+}
+
+// ===== BADGE CONTADOR =====
+ion-badge {
+  --background: var(--gallery-gradient);
+  --color: var(--gallery-white);
+  font-weight: 700;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+}
+
+// ===== ESTADOS VACÍOS =====
+.empty-state {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  color: #6b7280;
+
+  ion-icon {
+    margin-bottom: 1rem;
+    opacity: 0.6;
+  }
+
+  p {
+    font-size: 1rem;
+    line-height: 1.6;
+    margin: 0.5rem 0;
+  }
+}
+
+// ===== MODAL ESTILOS =====
 .modal-header {
   ion-toolbar {
-    --background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  }
-}
+    --background: var(--gallery-gradient);
+    --color: var(--gallery-white);
+    --border-width: 0;
+    
+    ion-title {
+      font-weight: 700;
+      font-size: 1.3rem;
+    }
 
-.modal-title {
-  font-weight: 600;
-  font-size: 1.2rem;
+    ion-button {
+      --color: var(--gallery-white);
+      --background: rgba(255, 255, 255, 0.2);
+      --border-radius: 50%;
+      backdrop-filter: blur(10px);
+    }
+  }
 }
 
 .modal-content {
-  --background: #f8f9fa;
+  --background: var(--gallery-light);
 }
 
-.hero-modal-container {
+.famoso-modal-container {
   display: flex;
   flex-direction: column;
   min-height: 100%;
 }
 
-.hero-image-section {
+.famoso-image-section {
   position: relative;
   height: 50vh;
-  overflow: hidden;
+  min-height: 300px;
 }
 
 .main-image-container {
   position: relative;
   width: 100%;
   height: 100%;
+  overflow: hidden;
 }
 
-.main-hero-image {
+.main-famoso-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  filter: brightness(1.1) contrast(1.1);
 }
 
 .image-gradient-overlay {
@@ -115,137 +351,281 @@ ion-button {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 60%;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+  height: 50%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
 }
 
-.image-info-badge {
+.modal-favorite-button {
   position: absolute;
-  bottom: 16px;
-  left: 16px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  padding: 8px 12px;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  color: #333;
-  font-weight: 500;
+  top: 1rem;
+  right: 1rem;
+  z-index: 10;
+
+  ion-button {
+    --border-radius: 50%;
+    --box-shadow: var(--gallery-shadow-lg);
+    backdrop-filter: blur(10px);
+    width: 48px;
+    height: 48px;
+
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
 }
 
-.hero-info-section {
+.famoso-info-section {
   flex: 1;
-  padding: 24px;
-  background: white;
-  border-radius: 24px 24px 0 0;
-  margin-top: -24px;
+  padding: 2rem;
+  background: var(--gallery-white);
   position: relative;
-  z-index: 2;
+  margin-top: -2rem;
+  border-radius: 2rem 2rem 0 0;
+  box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.1);
 }
 
-.hero-header {
-  margin-bottom: 24px;
+.famoso-header {
+  margin-bottom: 2rem;
+
+  .famoso-name {
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 0 0 1rem 0;
+    color: var(--gallery-dark);
+    line-height: 1.2;
+  }
+
+  .famoso-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+
+    ion-chip {
+      font-weight: 600;
+      padding: 0.5rem 1rem;
+      border-radius: 12px;
+
+      &.categoria-chip {
+        --background: rgba(99, 102, 241, 0.15);
+        --color: var(--gallery-primary);
+      }
+
+      &.ciudad-chip {
+        --background: rgba(139, 92, 246, 0.15);
+        --color: var(--gallery-secondary);
+      }
+
+      &.pais-chip {
+        --background: rgba(6, 182, 212, 0.15);
+        --color: var(--gallery-accent);
+      }
+
+      &.favorite-chip {
+        --background: rgba(239, 68, 68, 0.15);
+        --color: var(--gallery-danger);
+      }
+    }
+  }
 }
 
-.hero-name {
-  font-size: 2rem;
-  font-weight: 700;
-  margin: 0 0 12px 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+.famoso-bio-section {
+  margin-bottom: 2rem;
+
+  .bio-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--gallery-dark);
+    margin-bottom: 1rem;
+
+    ion-icon {
+      color: var(--gallery-primary);
+    }
+  }
+
+  .famoso-bio {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: #4b5563;
+    margin: 0;
+    text-align: justify;
+  }
+}
+
+.famoso-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: rgba(99, 102, 241, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(99, 102, 241, 0.1);
+
+  .stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .stat-label {
+      font-weight: 600;
+      color: var(--gallery-dark);
+      font-size: 0.9rem;
+    }
+
+    .stat-value {
+      font-weight: 700;
+      padding: 0.25rem 0.75rem;
+      border-radius: 8px;
+    }
+  }
+}
+
+// ===== ANIMACIONES =====
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(2deg);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.famoso-card {
+  animation: slideInUp 0.6s ease-out;
+}
+
+// ===== RESPONSIVE DESIGN =====
+@media (max-width: 768px) {
+  .famoso-card {
+    height: 280px;
+  }
+
+  .famoso-image-container {
+    height: 160px;
+  }
+
+  .famoso-name {
+    font-size: 1rem;
+  }
+
+  .famoso-info-section {
+    padding: 1.5rem;
+  }
+
+  .famoso-header .famoso-name {
+    font-size: 1.5rem;
+  }
+
+  .famoso-image-section {
+    height: 40vh;
+    min-height: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .famoso-card {
+    height: 260px;
+  }
+
+  .famoso-image-container {
+    height: 140px;
+  }
+
+  .famoso-info {
+    padding: 0.75rem;
+  }
+
+  .famoso-details {
+    gap: 0.25rem;
+
+    ion-chip {
+      font-size: 0.7rem;
+      padding: 2px 6px;
+    }
+  }
+}
+
+// ===== MODO OSCURO =====
+@media (prefers-color-scheme: dark) {
+  :host {
+    --gallery-white: #1f2937;
+    --gallery-light: #111827;
+    --gallery-dark: #f9fafb;
+  }
+
+  ion-card {
+    background: #1f2937;
+    border: 1px solid #374151;
+  }
+
+  .famoso-card {
+    background: #1f2937;
+    border: 1px solid #374151;
+  }
+
+  .famoso-info-section {
+    background: #1f2937;
+  }
+
+  .famoso-bio {
+    color: #d1d5db;
+  }
+}
+
+// ===== EFECTOS ADICIONALES =====
+.glass-effect {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.gradient-text {
+  background: var(--gallery-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.hero-badges {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+// ===== SCROLLBAR PERSONALIZADA =====
+ion-content::-webkit-scrollbar {
+  width: 8px;
 }
 
-.casa-chip,
-.aparicion-chip {
-  font-weight: 500;
-  
-  ion-icon {
-    margin-right: 4px;
-  }
+ion-content::-webkit-scrollbar-track {
+  background: rgba(99, 102, 241, 0.1);
+  border-radius: 4px;
 }
 
-.hero-bio-section {
-  margin-bottom: 24px;
+ion-content::-webkit-scrollbar-thumb {
+  background: var(--gallery-gradient);
+  border-radius: 4px;
+  transition: var(--gallery-transition);
 }
 
-.bio-title {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #333;
-  margin: 0 0 12px 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  ion-icon {
-    color: var(--ion-color-primary);
-  }
-}
-
-.hero-bio {
-  line-height: 1.6;
-  color: #666;
-  margin: 0;
-  font-size: 0.95rem;
-}
-
-.hero-stats {
-  display: flex;
-  gap: 16px;
-  padding: 16px;
-  background: #f8f9fa;
-  border-radius: 12px;
-  border: 1px solid #e9ecef;
-}
-
-.stat-item {
-  flex: 1;
-  text-align: center;
-}
-
-.stat-label {
-  display: block;
-  font-size: 0.8rem;
-  color: #666;
-  margin-bottom: 4px;
-}
-
-.stat-value {
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-// Responsive design
-@media (min-width: 768px) {
-  .hero-modal-container {
-    flex-direction: row;
-  }
-
-  .hero-image-section {
-    width: 40%;
-    height: 100vh;
-  }
-
-  .hero-info-section {
-    width: 60%;
-    margin-top: 0;
-    border-radius: 0;
-    padding: 32px;
-  }
-
-  .hero-stats {
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .stat-item {
-    text-align: left;
-  }
+ion-content::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, var(--gallery-secondary) 0%, var(--gallery-primary) 100%);
 }
