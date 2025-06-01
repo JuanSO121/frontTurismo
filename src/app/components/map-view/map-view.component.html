@@ -1,0 +1,15 @@
+<ion-card class="map-preview-card" (click)="openMap($event)">
+  <ion-card-header>
+    <ion-card-title>
+      <ion-icon name="location-outline"></ion-icon>
+      Ubicación capturada
+    </ion-card-title>
+  </ion-card-header>
+  <ion-card-content>
+    <p><strong>Coordenadas:</strong> {{ coordenadas }}</p>
+    <ion-button fill="clear" size="small" (click)="openMap($event)">
+      <ion-icon name="map-outline" slot="start"></ion-icon>
+      Ver en mapa completo
+    </ion-button>
+  </ion-card-content>
+</ion-card>

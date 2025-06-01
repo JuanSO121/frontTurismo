@@ -1,0 +1,30 @@
+.required {
+  color: var(--ion-color-danger);
+}
+
+.invalid {
+  border: 1px solid var(--ion-color-danger);
+}
+
+ion-note {
+  display: block;
+  margin-top: 5px;
+}
+
+.image-preview {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.preview-image {
+  max-width: 100%;
+  max-height: 200px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+ion-thumbnail {
+  --size: 80px;
+  --border-radius: 8px;
+}

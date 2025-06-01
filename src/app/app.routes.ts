@@ -20,6 +20,15 @@ export const routes: Routes = [
     path: 'register',
     loadComponent: () => import('./pages/register/register.page').then(m => m.RegisterPage)
   },
+    {
+    path: 'mapa',
+    loadComponent: () => import('./pages/mapa/mapa.page').then( m => m.MapaPage),
+  },
+    {
+    path: 'visita',
+    loadComponent: () => import('./pages/visita/visita.page').then( m => m.VisitaPage)
+  },
+
   {
     path: '**',
     redirectTo: 'login'
@@ -27,5 +36,9 @@ export const routes: Routes = [
   {
     path: 'register',
     loadComponent: () => import('./pages/register/register.page').then( m => m.RegisterPage)
-  }
+  },
+
+
+
+
 ];

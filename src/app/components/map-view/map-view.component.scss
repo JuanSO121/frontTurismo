@@ -1,0 +1,20 @@
+.map-preview-card {
+  margin: 10px 0;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.map-preview-card ion-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

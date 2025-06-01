@@ -11,11 +11,17 @@ import { authInterceptor } from './app/services/auth-interceptor.service';
 import { StorageService } from './app/services/storage.service';
 import { Storage } from '@ionic/storage-angular';
 import { Drivers } from '@ionic/storage';
+import { registerIcons } from './app/shared/icons'; // Importar la función
+
+
+registerIcons();
+
 
 // Factory para inicializar el storage antes de que la aplicación se cargue
 export function initializeStorageFactory(storageService: StorageService) {
   return () => storageService.init();
 }
+
 
 // Factory para crear una instancia de Storage
 export function storageFactory() {
