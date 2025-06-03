@@ -23,6 +23,10 @@ import {
   IonChip,
   IonBadge,
   IonToast,
+  IonSpinner,
+  IonList,
+  IonThumbnail,
+  IonNote,
   AlertController,
   LoadingController,
   ModalController,
@@ -43,12 +47,16 @@ import {
   locationOutline,
   globeOutline,
   homeOutline,
-  mapOutline
+  mapOutline,
+  restaurantOutline,
+  pricetagOutline,
+  cashOutline
 } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
-import { Sitio, Pais } from 'src/app/interfaces/turismo.interfac';
+import { Sitio, Pais, Plato } from 'src/app/interfaces/turismo.interfac';
 import { SitiosService } from 'src/app/services/turismo/sitios.service';
 import { PaisesService } from 'src/app/services/turismo/paises.service';
+import { PlatosService } from 'src/app/services/turismo/platos.service';
 import { FavoriteService } from 'src/app/services/favoritos/favorite.service';
 
 @Component({
@@ -59,6 +67,10 @@ import { FavoriteService } from 'src/app/services/favoritos/favorite.service';
   imports: [
     IonSearchbar,
     IonToast,
+    IonSpinner,
+    IonList,
+    IonThumbnail,
+    IonNote,
     CommonModule,
     FormsModule,
     IonCard,
@@ -101,6 +113,8 @@ export class SitiosComponent implements OnInit {
   // Modal properties
   isModalOpen: boolean = false;
   selectedSitioForModal: Sitio | null = null;
+  platosDelSitio: Plato[] = []; // Platos del sitio seleccionado
+  loadingPlatos: boolean = false;
 
   // Toast properties
   isToastOpen: boolean = false;
@@ -113,6 +127,7 @@ export class SitiosComponent implements OnInit {
   constructor(
     private sitiosService: SitiosService,
     private paisesService: PaisesService,
+    private platosService: PlatosService,
     private favoriteService: FavoriteService,
     private alertController: AlertController,
     private loadingController: LoadingController,
@@ -132,7 +147,10 @@ export class SitiosComponent implements OnInit {
       locationOutline,
       globeOutline,
       homeOutline,
-      mapOutline
+      mapOutline,
+      restaurantOutline,
+      pricetagOutline,
+      cashOutline
     });
   }
 
@@ -255,14 +273,55 @@ export class SitiosComponent implements OnInit {
   }
 
   // Método para abrir el modal con información del sitio
-  openSitioModal(sitio: Sitio) {
+  async openSitioModal(sitio: Sitio) {
     this.selectedSitioForModal = sitio;
+    this.platosDelSitio = [];
     this.isModalOpen = true;
+    
+    // Si es un restaurante, cargar los platos
+    if (this.isRestaurante(sitio)) {
+      await this.loadPlatosDelSitio(sitio);
+    }
   }
 
   closeModal() {
     this.isModalOpen = false;
     this.selectedSitioForModal = null;
+    this.platosDelSitio = [];
+  }
+
+  // Verificar si el sitio es un restaurante
+  isRestaurante(sitio: Sitio): boolean {
+    return sitio.tipo?.toLowerCase().includes('restaurante') || 
+           sitio.tipo?.toLowerCase().includes('comida') ||
+           sitio.tipo?.toLowerCase().includes('gastronom');
+  }
+
+  // Cargar platos del sitio
+  async loadPlatosDelSitio(sitio: Sitio) {
+    if (!sitio._id || !sitio.plato_id || sitio.plato_id.length === 0) {
+      console.log('No hay platos asociados a este sitio');
+      return;
+    }
+
+    this.loadingPlatos = true;
+    
+    try {
+      // Cargar cada plato por ID
+      const platosPromises = sitio.plato_id.map(platoId => 
+        this.platosService.getPlatoById(platoId).toPromise()
+      );
+      
+      const platos = await Promise.all(platosPromises);
+      this.platosDelSitio = platos.filter(plato => plato != null) as Plato[];
+      
+      console.log('Platos del sitio cargados:', this.platosDelSitio);
+    } catch (error) {
+      console.error('Error al cargar platos del sitio:', error);
+      this.showToast('Error al cargar los platos del restaurante', 'danger');
+    } finally {
+      this.loadingPlatos = false;
+    }
   }
 
   async toggleFavorite(sitio: Sitio) {
@@ -310,6 +369,26 @@ export class SitiosComponent implements OnInit {
       return sitio.img;
     }
     return this.defaultImage;
+  }
+
+  getPlatoImageUrl(plato: Plato): string {
+    return plato.img || this.defaultImage;
+  }
+
+  formatPrice(precio: string | undefined): string {
+    if (!precio) return 'Precio no disponible';
+    
+    // Si ya tiene formato de moneda, devolverlo tal como está
+    if (precio.includes('$') || precio.includes('€') || precio.includes('£')) {
+      return precio;
+    }
+    
+    // Si es un número, agregar símbolo de dólar
+    if (!isNaN(Number(precio))) {
+      return `$${precio}`;
+    }
+    
+    return precio;
   }
 
   handleImageError(event: Event) {

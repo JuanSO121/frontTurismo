@@ -23,22 +23,6 @@
     </ion-refresher-content>
   </ion-refresher>
 
-  <!-- Estadísticas -->
-  <ion-card class="stats-card">
-    <ion-card-content>
-      <div class="stats-container">
-        <div class="stat-item">
-          <ion-badge color="danger" class="stat-badge">{{ totalFavorites }}</ion-badge>
-          <span class="stat-label">Total de favoritos</span>
-        </div>
-        <div class="stat-item">
-          <ion-badge color="primary" class="stat-badge">{{ uniqueHeroes }}</ion-badge>
-          <span class="stat-label">Héroes diferentes</span>
-        </div>
-      </div>
-    </ion-card-content>
-  </ion-card>
-
   @if (totalFavorites > 0) {
     <!-- Controles de búsqueda y filtros -->
     <ion-card class="controls-card">
@@ -69,7 +53,7 @@
               <ion-label>Recientes</ion-label>
             </ion-segment-button>
             <ion-segment-button value="hero">
-              <ion-label>Por héroe</ion-label>
+              <ion-label>Por Nombre</ion-label>
             </ion-segment-button>
             <ion-segment-button value="date">
               <ion-label>Por fecha</ion-label>

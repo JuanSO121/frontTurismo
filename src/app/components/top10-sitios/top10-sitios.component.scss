@@ -1,0 +1,524 @@
+// ===== ESTILOS PARA EL HEADER DEL RANKING =====
+.ranking-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--ion-color-dark);
+  
+  ion-icon {
+    font-size: 1.4rem;
+  }
+}
+
+.ranking-card {
+  overflow: hidden;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  
+  .ranking-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    
+    .ranking-title-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--ion-color-dark);
+      
+      ion-icon {
+        font-size: 1.3rem;
+      }
+    }
+    
+    .ranking-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      
+      ion-icon {
+        font-size: 0.85rem;
+      }
+    }
+  }
+}
+
+// ===== ESTILOS DE LOADING/SKELETON =====
+.ranking-item-skeleton {
+  .ranking-card-skeleton {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: var(--ion-color-light);
+    border-radius: 12px;
+    margin-bottom: 12px;
+    
+    .skeleton-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+  }
+}
+
+// ===== ESTILOS PRINCIPALES DEL RANKING =====
+.ranking-item-col {
+  padding: 6px;
+}
+
+.ranking-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: var(--ion-color-light);
+  border-radius: 12px;
+  margin-bottom: 12px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  border: 2px solid transparent;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    background: var(--ion-color-light-tint);
+  }
+  
+  &.top-three {
+    background: linear-gradient(135deg, 
+      var(--ion-color-warning-tint) 0%, 
+      var(--ion-color-light) 100%);
+    border-color: var(--ion-color-warning-shade);
+    
+    &:hover {
+      background: linear-gradient(135deg, 
+        var(--ion-color-warning-tint) 0%, 
+        var(--ion-color-light-tint) 100%);
+      box-shadow: 0 12px 32px rgba(var(--ion-color-warning-rgb), 0.25);
+    }
+    
+    .ranking-position .position-circle {
+      background: linear-gradient(135deg, 
+        var(--ion-color-warning) 0%, 
+        var(--ion-color-warning-shade) 100%);
+      box-shadow: 0 4px 12px rgba(var(--ion-color-warning-rgb), 0.4);
+      transform: scale(1.1);
+    }
+  }
+  
+  // Efectos especiales para posiciones específicas
+  &:nth-child(1) {
+    &.top-three {
+      background: linear-gradient(135deg, 
+        #566580 0%, 
+        #222428 100%);
+      border-color: rgb(115, 106, 83);
+      
+      .ranking-position .position-circle {
+        background: linear-gradient(135deg, #FFD700, #FFA500);
+        box-shadow: 0 6px 16px rgba(255, 215, 0, 0.5);
+      }
+    }
+  }
+  
+  &:nth-child(2) {
+    &.top-three {
+      background: linear-gradient(135deg, 
+        #C0C0C0 0%, 
+        #A8A8A8 100%);
+      border-color: #909090;
+      
+      .ranking-position .position-circle {
+        background: linear-gradient(135deg, #C0C0C0, #A8A8A8);
+        box-shadow: 0 6px 16px rgba(192, 192, 192, 0.5);
+      }
+    }
+  }
+  
+  &:nth-child(3) {
+    &.top-three {
+      background: linear-gradient(135deg, 
+        #CD7F32 0%, 
+        #B87333 100%);
+      border-color: #A0522D;
+      
+      .ranking-position .position-circle {
+        background: linear-gradient(135deg, #CD7F32, #B87333);
+        box-shadow: 0 6px 16px rgba(205, 127, 50, 0.5);
+      }
+    }
+  }
+}
+
+// ===== POSICIÓN Y MEDALLA =====
+.ranking-position {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  .position-circle {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--ion-color-medium);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    
+    ion-icon {
+      position: absolute;
+      top: 2px;
+      font-size: 1.2rem;
+      z-index: 2;
+    }
+    
+    .position-number {
+      position: absolute;
+      bottom: 2px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: white;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      z-index: 2;
+    }
+  }
+}
+
+// ===== IMAGEN DEL SITIO =====
+.sitio-image-container {
+  position: relative;
+  width: 70px;
+  height: 70px;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+  
+  .sitio-thumbnail {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  
+  .image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, 
+      rgba(0,0,0,0.1), 
+      transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  &:hover {
+    .sitio-thumbnail {
+      transform: scale(1.05);
+    }
+    
+    .image-overlay {
+      opacity: 1;
+    }
+  }
+}
+
+// ===== INFORMACIÓN DEL SITIO =====
+.sitio-info {
+  flex: 1;
+  min-width: 0; // Para permitir text truncation
+  
+  .sitio-name {
+    margin: 0 0 8px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--ion-color-dark);
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .sitio-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+    
+    ion-chip {
+      --background: transparent;
+      --color: var(--ion-color-dark);
+      font-size: 0.75rem;
+      height: 22px;
+      border: 1px solid;
+      
+      ion-icon {
+        font-size: 0.8rem;
+      }
+    }
+  }
+  
+  .sitio-description {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--ion-color-medium-shade);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+// ===== ACCIONES DEL SITIO =====
+.sitio-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  
+  ion-button {
+    --border-radius: 50%;
+    --padding-start: 8px;
+    --padding-end: 8px;
+    --padding-top: 8px;
+    --padding-bottom: 8px;
+    
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+}
+
+// ===== ESTADOS VACÍOS =====
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  
+  ion-icon[size="large"] {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    opacity: 0.7;
+  }
+  
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--ion-color-dark);
+    margin: 0 0 12px 0;
+  }
+  
+  p {
+    color: var(--ion-color-medium-shade);
+    line-height: 1.6;
+    margin: 8px 0;
+    
+    &.empty-subtitle {
+      font-size: 0.9rem;
+      font-style: italic;
+      opacity: 0.8;
+    }
+  }
+  
+  ion-chip {
+    margin-top: 16px;
+  }
+}
+
+// ===== RESPONSIVE DESIGN =====
+@media (max-width: 768px) {
+  .ranking-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    
+    .ranking-badge {
+      align-self: flex-end;
+    }
+  }
+  
+  .ranking-item {
+    padding: 12px;
+    gap: 12px;
+    
+    .ranking-position .position-circle {
+      width: 45px;
+      height: 45px;
+      
+      ion-icon {
+        font-size: 1.1rem;
+      }
+      
+      .position-number {
+        font-size: 0.7rem;
+      }
+    }
+    
+    .sitio-image-container {
+      width: 60px;
+      height: 60px;
+    }
+    
+    .sitio-info {
+      .sitio-name {
+        font-size: 1rem;
+      }
+      
+      .sitio-details ion-chip {
+        font-size: 0.7rem;
+        height: 20px;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .ranking-item {
+    flex-direction: column;
+    text-align: center;
+    padding: 16px;
+    
+    .ranking-position {
+      order: -1;
+      margin-bottom: 8px;
+    }
+    
+    .sitio-image-container {
+      width: 80px;
+      height: 80px;
+    }
+    
+    .sitio-info {
+      order: 1;
+      text-align: center;
+      
+      .sitio-details {
+        justify-content: center;
+      }
+    }
+    
+    .sitio-actions {
+      order: 2;
+      flex-direction: row;
+    }
+  }
+  
+  .empty-state {
+    padding: 30px 16px;
+    
+    ion-icon[size="large"] {
+      font-size: 3rem;
+    }
+    
+    h3 {
+      font-size: 1.1rem;
+    }
+  }
+}
+
+// ===== ANIMACIONES =====
+@keyframes rankingPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes goldShimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.ranking-item {
+  &:nth-child(1).top-three {
+    .ranking-position .position-circle {
+      background: linear-gradient(90deg, 
+        #FFD700 0%, 
+        #FFF700 25%, 
+        #FFD700 50%, 
+        #FFF700 75%, 
+        #FFD700 100%);
+      background-size: 200% 100%;
+      animation: goldShimmer 2s ease-in-out infinite;
+    }
+  }
+  
+  &.top-three:hover {
+    .ranking-position .position-circle {
+      animation: rankingPulse 0.6s ease-in-out;
+    }
+  }
+}
+
+// ===== EFECTOS DE RIPPLE =====
+ion-ripple-effect {
+  color: var(--ion-color-primary);
+}
+
+// ===== MEJORAS DE ACCESIBILIDAD =====
+.ranking-item {
+  &:focus-within {
+    outline: 2px solid var(--ion-color-primary);
+    outline-offset: 2px;
+  }
+}
+
+// ===== TEMA OSCURO =====
+@media (prefers-color-scheme: dark) {
+  .ranking-item {
+    background: var(--ion-color-dark-tint);
+    
+    &:hover {
+      background: var(--ion-color-dark-shade);
+    }
+    
+    &.top-three {
+      background: linear-gradient(135deg, 
+        rgba(255, 193, 7, 0.2) 0%, 
+        var(--ion-color-dark-tint) 100%);
+    }
+  }
+  
+  .sitio-info {
+    .sitio-name {
+      color: var(--ion-color-light);
+    }
+    
+    .sitio-description {
+      color: var(--ion-color-medium);
+    }
+  }
+  
+  .empty-state {
+    h3 {
+      color: var(--ion-color-light);
+    }
+    
+    p {
+      color: var(--ion-color-medium);
+    }
+  }
+}

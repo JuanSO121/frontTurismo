@@ -1,0 +1,172 @@
+<!-- Header Card -->
+<ion-card class="ranking-header-card">
+  <ion-card-header>
+    <ion-card-title class="ranking-title">
+      <div class="title-content">
+        <ion-icon name="flame-outline" color="danger"></ion-icon>
+        <span>Top Famosos Más Visitados</span>
+      </div>
+      <ion-badge color="danger" class="ranking-badge">
+        <ion-icon name="eye-outline"></ion-icon>
+        Trending
+      </ion-badge>
+    </ion-card-title>
+  </ion-card-header>
+</ion-card>
+
+<!-- Loading State -->
+@if (isLoading) {
+  <ion-card class="carousel-container">
+    <ion-card-content>
+      <div class="carousel-wrapper">
+        <div class="carousel-track">
+          @for (item of [1,2,3]; track item) {
+            <div class="famoso-card skeleton-card">
+              <div class="card-header">
+                <ion-skeleton-text animated style="width: 40px; height: 40px; border-radius: 50%;"></ion-skeleton-text>
+                <ion-skeleton-text animated style="width: 60%; height: 20px;"></ion-skeleton-text>
+              </div>
+              <ion-skeleton-text animated style="width: 100%; height: 200px; border-radius: 12px;"></ion-skeleton-text>
+              <div class="card-content">
+                <ion-skeleton-text animated style="width: 80%; height: 24px;"></ion-skeleton-text>
+                <ion-skeleton-text animated style="width: 60%; height: 16px;"></ion-skeleton-text>
+                <ion-skeleton-text animated style="width: 40%; height: 16px;"></ion-skeleton-text>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </ion-card-content>
+  </ion-card>
+}
+
+<!-- Carousel -->
+@if (!isLoading && top10Famosos.length > 0) {
+  <ion-card class="carousel-container">
+    <ion-card-content>
+      <!-- Navigation Buttons -->
+      <div class="carousel-controls">
+        <ion-button 
+          fill="clear" 
+          size="small" 
+          [disabled]="!canGoPrev"
+          (click)="prevSlide()"
+          class="nav-button prev-button">
+          <ion-icon name="chevron-back-outline"></ion-icon>
+        </ion-button>
+        
+        <div class="slide-indicators">
+          @for (slide of [].constructor(totalSlides); track $index) {
+            <div 
+              class="indicator" 
+              [class.active]="$index === currentSlide"
+              (click)="goToSlide($index)">
+            </div>
+          }
+        </div>
+        
+        <ion-button 
+          fill="clear" 
+          size="small" 
+          [disabled]="!canGoNext"
+          (click)="nextSlide()"
+          class="nav-button next-button">
+          <ion-icon name="chevron-forward-outline"></ion-icon>
+        </ion-button>
+      </div>
+
+      <!-- Carousel Wrapper -->
+      <div class="carousel-wrapper">
+        <div class="carousel-track" #carouselContainer>
+          @for (famoso of top10Famosos; track famoso.famoso_id; let i = $index) {
+            <div class="famoso-card" [class.top-three]="famoso.ranking <= 3">
+              <ion-ripple-effect></ion-ripple-effect>
+              
+              <!-- Card Header con Ranking -->
+              <div class="card-header">
+                <div class="ranking-position">
+                  <div class="position-circle" [attr.data-color]="getRankingColor(famoso.ranking)">
+                    <ion-icon 
+                      [name]="getRankingIcon(famoso.ranking)" 
+                      [color]="getRankingColor(famoso.ranking)">
+                    </ion-icon>
+                    <span class="position-number">#{{ famoso.ranking }}</span>
+                  </div>
+                </div>
+                
+                <div class="visitas-badge">
+                  <ion-chip color="success" size="small">
+                    <ion-icon name="eye-outline"></ion-icon>
+                    <ion-label>{{ formatVisitas(famoso.totalVisitas) }}</ion-label>
+                  </ion-chip>
+                </div>
+              </div>
+
+              <!-- Imagen del Famoso -->
+              <div class="famoso-image-container">
+                <img 
+                  [src]="getFamosoImageUrl(famoso)" 
+                  (error)="handleImageError($event)" 
+                  [alt]="famoso.nombre" 
+                  class="famoso-image">
+                <div class="image-overlay"></div>
+                
+                <!-- Favorite Button Overlay -->
+                <ion-button 
+                  fill="clear" 
+                  size="small"
+                  class="favorite-button"
+                  [color]="isFavorite(famoso) ? 'danger' : 'light'"
+                  (click)="toggleFavorite(famoso)">
+                  <ion-icon [name]="isFavorite(famoso) ? 'heart' : 'heart-outline'"></ion-icon>
+                </ion-button>
+              </div>
+
+              <!-- Card Content -->
+              <div class="card-content">
+                <h3 class="famoso-name">{{ famoso.nombre }}</h3>
+                
+                <div class="famoso-details">
+                  <ion-chip size="small" color="primary" outline>
+                    <ion-icon name="person-outline"></ion-icon>
+                    <ion-label>{{ famoso.categoria }}</ion-label>
+                  </ion-chip>
+                  
+                  @if (famoso.ciudad) {
+                    <ion-chip size="small" color="secondary" outline>
+                      <ion-icon name="location-outline"></ion-icon>
+                      <ion-label>{{ famoso.ciudad }}</ion-label>
+                    </ion-chip>
+                  }
+                </div>
+                
+                @if (famoso.descripcion) {
+                  <p class="famoso-description">
+                    {{ famoso.descripcion | slice:0:80 }}@if (famoso.descripcion.length > 80) {&hellip;}
+                  </p>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </ion-card-content>
+  </ion-card>
+}
+
+<!-- Empty State -->
+@if (!isLoading && top10Famosos.length === 0) {
+  <ion-card>
+    <ion-card-content class="ion-text-center ion-padding empty-state">
+      <ion-icon name="star-outline" size="large" color="medium"></ion-icon>
+      <h3>Sin Datos de Ranking</h3>
+      <p>No hay información de famosos visitados disponible en este momento.</p>
+      <p class="empty-subtitle">Los famosos necesitan registro de visitas para aparecer en el ranking.</p>
+      
+      <ion-button fill="outline" color="primary" (click)="loadTop10Famosos()">
+        <ion-icon name="refresh-outline" slot="start"></ion-icon>
+        Recargar
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+}

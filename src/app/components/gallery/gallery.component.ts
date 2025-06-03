@@ -42,8 +42,7 @@ import {
   heart,
   locationOutline,
   globeOutline,
-  personOutline
-} from 'ionicons/icons';
+  personOutline, funnelOutline, filterOutline, closeCircleOutline, searchOutline, refreshOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { Famoso, Pais } from 'src/app/interfaces/turismo.interfac';
 import { FamososService } from 'src/app/services/turismo/famosos.service';
@@ -88,13 +87,15 @@ export class GalleryComponent implements OnInit {
   // Datos principales
   paises: Pais[] = [];
   ciudades: string[] = [];
+  categorias: string[] = []; // Nueva propiedad para categorías
   famososDelPais: Famoso[] = []; // Todos los famosos del país seleccionado
-  famososFiltrados: Famoso[] = []; // Famosos filtrados por ciudad (si se selecciona)
+  famososFiltrados: Famoso[] = []; // Famosos filtrados por ciudad y/o categoría
   famososMostrados: Famoso[] = []; // Los famosos que se muestran actualmente
   
   // Selecciones actuales
   selectedPais: Pais | null = null;
   selectedCiudad: string = ''; // Vacío significa "todas las ciudades"
+  selectedCategoria: string = ''; // Nueva propiedad para categoría seleccionada
   selectedFamoso: Famoso | null = null;
   
   // Modal properties
@@ -118,20 +119,7 @@ export class GalleryComponent implements OnInit {
     private modalController: ModalController,
     private toastController: ToastController
   ) {
-    addIcons({
-      addCircleOutline,
-      informationCircleOutline,
-      trashOutline,
-      imageOutline,
-      closeOutline,
-      businessOutline,
-      calendarOutline,
-      heartOutline,
-      heart,
-      locationOutline,
-      globeOutline,
-      personOutline
-    });
+    addIcons({funnelOutline,filterOutline,closeCircleOutline,informationCircleOutline,personOutline,locationOutline,searchOutline,refreshOutline,globeOutline,closeOutline,heart,addCircleOutline,trashOutline,imageOutline,businessOutline,calendarOutline,heartOutline});
   }
 
   ngOnInit() {
@@ -170,11 +158,13 @@ export class GalleryComponent implements OnInit {
     
     // Reset selections
     this.selectedCiudad = '';
+    this.selectedCategoria = ''; // Reset categoría
     this.selectedFamoso = null;
     this.famososDelPais = [];
     this.famososFiltrados = [];
     this.famososMostrados = [];
     this.ciudades = [];
+    this.categorias = []; // Reset categorías
     
     if (!paisId) {
       this.selectedPais = null;
@@ -198,15 +188,18 @@ export class GalleryComponent implements OnInit {
             this.famososDelPais = response.data;
             // Mostrar TODOS los famosos del país inicialmente
             this.famososMostrados = [...this.famososDelPais];
-            // Extraer ciudades únicas de los famosos del país
+            // Extraer ciudades y categorías únicas de los famosos del país
             this.extractCiudadesFromFamosos(this.famososDelPais);
+            this.extractCategoriasFromFamosos(this.famososDelPais); // Nueva función
             console.log('Famosos del país cargados:', this.famososDelPais);
             console.log('Ciudades disponibles:', this.ciudades);
+            console.log('Categorías disponibles:', this.categorias);
           } else {
             console.error('Formato de respuesta inesperado:', response);
             this.famososDelPais = [];
             this.famososMostrados = [];
             this.ciudades = [];
+            this.categorias = [];
           }
           loading.dismiss();
         },
@@ -216,6 +209,7 @@ export class GalleryComponent implements OnInit {
           this.famososDelPais = [];
           this.famososMostrados = [];
           this.ciudades = [];
+          this.categorias = [];
           loading.dismiss();
         }
       });
@@ -237,19 +231,69 @@ export class GalleryComponent implements OnInit {
     this.ciudades = ciudadesUnicas.sort(); // Ordenar alfabéticamente
   }
 
+  // Nueva función para extraer categorías únicas
+  private extractCategoriasFromFamosos(famosos: Famoso[]) {
+    const categoriasUnicas = [...new Set(
+      famosos
+        .map((f: Famoso) => f.categoria)
+        .filter((categoria): categoria is string => 
+          typeof categoria === 'string' && categoria.trim() !== ''
+        )
+    )];
+    this.categorias = categoriasUnicas.sort(); // Ordenar alfabéticamente
+  }
+
   ciudadSelected(event: Event) {
     const selectElement = event.target as HTMLIonSelectElement;
     this.selectedCiudad = selectElement.value;
-    
-    if (!this.selectedCiudad) {
-      // Si no hay ciudad seleccionada, mostrar TODOS los famosos del país
-      this.famososMostrados = [...this.famososDelPais];
-    } else {
-      // Filtrar famosos por la ciudad seleccionada
-      this.famososMostrados = this.famososDelPais.filter(famoso => famoso.ciudad === this.selectedCiudad);
+    this.applyFilters(); // Aplicar filtros combinados
+  }
+
+  // Nueva función para manejar selección de categoría
+  categoriaSelected(event: Event) {
+    const selectElement = event.target as HTMLIonSelectElement;
+    this.selectedCategoria = selectElement.value;
+    this.applyFilters(); // Aplicar filtros combinados
+  }
+
+  // Nueva función para aplicar filtros combinados
+  private applyFilters() {
+    let famososFiltrados = [...this.famososDelPais];
+
+    // Filtrar por ciudad si se seleccionó una
+    if (this.selectedCiudad) {
+      famososFiltrados = famososFiltrados.filter(famoso => famoso.ciudad === this.selectedCiudad);
     }
+
+    // Filtrar por categoría si se seleccionó una
+    if (this.selectedCategoria) {
+      famososFiltrados = famososFiltrados.filter(famoso => famoso.categoria === this.selectedCategoria);
+    }
+
+    this.famososMostrados = famososFiltrados;
+    console.log('Famosos mostrados después del filtro:', this.famososMostrados);
     
-    console.log('Famosos mostrados:', this.famososMostrados);
+    // Log para debug
+    console.log('Filtros aplicados:', {
+      ciudad: this.selectedCiudad,
+      categoria: this.selectedCategoria,
+      resultados: this.famososMostrados.length
+    });
+  }
+
+  // Función para limpiar todos los filtros
+  clearFilters() {
+    this.selectedCiudad = '';
+    this.selectedCategoria = '';
+    this.famososMostrados = [...this.famososDelPais];
+  }
+
+  // Función para obtener texto descriptivo de los filtros activos
+  getActiveFiltersText(): string {
+    const filters = [];
+    if (this.selectedCiudad) filters.push(`Ciudad: ${this.selectedCiudad}`);
+    if (this.selectedCategoria) filters.push(`Categoría: ${this.selectedCategoria}`);
+    return filters.length > 0 ? filters.join(' | ') : '';
   }
 
   // Método para abrir el modal con información del famoso

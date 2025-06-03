@@ -8,6 +8,26 @@ export interface Famoso {
   img?: string | string[]; // Allow both single string and array of strings
 }
 
+export interface FamosoRanking {
+  ranking: number;
+  famoso_id: string;
+  nombre: string;
+  categoria: string;
+  ciudad: string;
+  descripcion: string;
+  img: string;
+  pais_id: string;
+  totalVisitas: number;
+}
+
+// Interface para la respuesta del top 10
+export interface Top10FamososResponse {
+  ok: boolean;
+  msg: string;
+  data: FamosoRanking[];
+  total: number;
+}
+
 export interface Pais {
   _id?: string;
   nombre: string;

@@ -6,6 +6,8 @@ import {
   IonTitle, 
   IonContent, IonCard, IonItem, IonIcon, IonFabButton, IonFabList, IonFab, IonButton, IonChip, IonLabel, IonCardContent } from '@ionic/angular/standalone';
 import { GalleryComponent } from '../components/gallery/gallery.component';
+import { RankingFamososComponent } from '../components/ranking-famosos/ranking-famosos.component';
+
 
 @Component({
   selector: 'app-tab3',
@@ -18,7 +20,8 @@ import { GalleryComponent } from '../components/gallery/gallery.component';
     IonToolbar, 
     IonTitle, 
     IonContent,
-    GalleryComponent
+    GalleryComponent,
+    RankingFamososComponent
   ],
 })
 export class Tab3Page {

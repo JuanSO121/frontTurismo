@@ -6,7 +6,7 @@ import { Observable, catchError, map, throwError, tap, of, switchMap, from } fro
 import { Router } from '@angular/router';
 import { StorageService } from '../storage.service';
 import { URL_TURISMO } from 'src/app/config/url.servicios';
-import { Famoso } from 'src/app/interfaces/turismo.interfac';
+import { Famoso,FamosoRanking,Top10FamososResponse } from 'src/app/interfaces/turismo.interfac';
 
 @Injectable({
   providedIn: 'root'
@@ -110,6 +110,51 @@ export class FamososService {
     return this.http.post<any>(url, body).pipe(
       tap(response => console.log('Respuesta de búsqueda por país:', response)),
       catchError(this.handleError.bind(this))
+    );
+  }
+
+  /**
+   * Obtiene el top 10 de famosos más visitados
+   * @returns Observable con el ranking de famosos más visitados
+   */
+  getTop10FamososMasVisitados(): Observable<Top10FamososResponse> {
+    const url = `${URL_TURISMO}/famosos/top`;
+
+    return this.http.get<Top10FamososResponse>(url).pipe(
+      tap(response => {
+        console.log('Top 10 famosos más visitados:', response);
+        if (response.data && response.data.length > 0) {
+          console.log('Famoso más visitado:', response.data[0]);
+        }
+      }),
+      map(response => {
+        // Validar la estructura de la respuesta
+        if (!response.ok || !response.data) {
+          throw new Error('Respuesta inválida del servidor');
+        }
+        return response;
+      }),
+      catchError(this.handleError.bind(this))
+    );
+  }
+
+  /**
+   * Obtiene solo los datos del top 10 sin la estructura de respuesta completa
+   * @returns Observable con el array de famosos rankeados
+   */
+  getTop10FamososData(): Observable<FamosoRanking[]> {
+    return this.getTop10FamososMasVisitados().pipe(
+      map(response => response.data || [])
+    );
+  }
+
+  /**
+   * Obtiene el famoso más visitado (posición #1 del ranking)
+   * @returns Observable con el famoso más visitado
+   */
+  getFamosoMasVisitado(): Observable<FamosoRanking | null> {
+    return this.getTop10FamososData().pipe(
+      map(famosos => famosos.length > 0 ? famosos[0] : null)
     );
   }
 

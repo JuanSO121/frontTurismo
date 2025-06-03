@@ -54,6 +54,15 @@
                   <div class="image-overlay">
                     <ion-icon name="information-circle-outline" class="info-icon"></ion-icon>
                   </div>
+                  <!-- Indicador de restaurante -->
+                  @if (isRestaurante(sitio)) {
+                    <div class="restaurant-indicator">
+                      <ion-chip color="success" size="small">
+                        <ion-icon name="restaurant-outline"></ion-icon>
+                        <ion-label>Restaurante</ion-label>
+                      </ion-chip>
+                    </div>
+                  }
                   <div class="sitio-actions" (click)="$event.stopPropagation()">
                     <ion-button fill="clear" [color]="isFavorite(sitio) ? 'danger' : 'medium'" (click)="toggleFavorite(sitio)">
                       <ion-icon [name]="isFavorite(sitio) ? 'heart' : 'heart-outline'"></ion-icon>
@@ -111,7 +120,12 @@
   <ng-template>
     <ion-header class="modal-header">
       <ion-toolbar color="dark">
-        <ion-title class="modal-title">{{ selectedSitioForModal?.nombre }}</ion-title>
+        <ion-title class="modal-title">
+          {{ selectedSitioForModal?.nombre }}
+          @if (selectedSitioForModal && isRestaurante(selectedSitioForModal)) {
+            <ion-icon name="restaurant-outline" class="restaurant-icon"></ion-icon>
+          }
+        </ion-title>
         <ion-button slot="end" fill="clear" color="light" (click)="closeModal()">
           <ion-icon name="close-outline"></ion-icon>
         </ion-button>
@@ -147,6 +161,12 @@
                   <ion-icon name="business-outline"></ion-icon>
                   <ion-label>{{ selectedSitioForModal.tipo }}</ion-label>
                 </ion-chip>
+                @if (isRestaurante(selectedSitioForModal)) {
+                  <ion-chip color="success" class="restaurant-chip">
+                    <ion-icon name="restaurant-outline"></ion-icon>
+                    <ion-label>Restaurante</ion-label>
+                  </ion-chip>
+                }
                 @if (selectedSitioForModal.ciudad) {
                   <ion-chip color="secondary" class="ciudad-chip">
                     <ion-icon name="location-outline"></ion-icon>
@@ -182,6 +202,52 @@
               <p class="sitio-bio">{{ selectedSitioForModal.descripcion || 'No hay descripción disponible para este sitio turístico.' }}</p>
             </div>
 
+            <!-- Sección de platos (solo para restaurantes) -->
+            @if (isRestaurante(selectedSitioForModal)) {
+              <div class="platos-section">
+                <h3 class="platos-title">
+                  <ion-icon name="restaurant-outline"></ion-icon>
+                  Menú del Restaurante
+                </h3>
+                
+                @if (loadingPlatos) {
+                  <div class="loading-platos">
+                    <ion-spinner name="crescent"></ion-spinner>
+                    <p>Cargando menú...</p>
+                  </div>
+                } @else if (platosDelSitio.length > 0) {
+                  <ion-list class="platos-list">
+                    @for (plato of platosDelSitio; track plato._id) {
+                      <ion-item class="plato-item">
+                        <ion-thumbnail slot="start" class="plato-thumbnail">
+                          <img [src]="getPlatoImageUrl(plato)" 
+                               (error)="handleImageError($event)" 
+                               [alt]="plato.nombre">
+                        </ion-thumbnail>
+                        <ion-label>
+                          <h3 class="plato-name">{{ plato.nombre }}</h3>
+                          @if (plato.descripcion) {
+                            <p class="plato-description">{{ plato.descripcion }}</p>
+                          }
+                          @if (plato.precio) {
+                            <ion-note slot="end" color="success" class="plato-price">
+                              <ion-icon name="cash-outline"></ion-icon>
+                              {{ formatPrice(plato.precio) }}
+                            </ion-note>
+                          }
+                        </ion-label>
+                      </ion-item>
+                    }
+                  </ion-list>
+                } @else {
+                  <div class="no-platos">
+                    <ion-icon name="restaurant-outline" size="large" color="medium"></ion-icon>
+                    <p>No hay platos registrados para este restaurante.</p>
+                  </div>
+                }
+              </div>
+            }
+
             <div class="sitio-stats">
               <div class="stat-item">
                 <span class="stat-label">Tipo</span>
@@ -201,6 +267,12 @@
                 <div class="stat-item">
                   <span class="stat-label">Dirección</span>
                   <ion-badge color="medium" class="stat-value">{{ selectedSitioForModal.direccion }}</ion-badge>
+                </div>
+              }
+              @if (isRestaurante(selectedSitioForModal)) {
+                <div class="stat-item">
+                  <span class="stat-label">Platos disponibles</span>
+                  <ion-badge color="success" class="stat-value">{{ platosDelSitio.length }}</ion-badge>
                 </div>
               }
             </div>

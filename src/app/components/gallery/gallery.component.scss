@@ -629,3 +629,39 @@ ion-content::-webkit-scrollbar-thumb {
 ion-content::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(135deg, var(--gallery-secondary) 0%, var(--gallery-primary) 100%);
 }
+
+// .filter-card {
+//   margin-top: 1rem;
+//   border: 1px solid var(--ion-color-light-shade);
+// }
+
+.filter-title {
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filter-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.active-filters {
+  flex-grow: 1;
+}
+
+.filter-indicator {
+  font-size: 0.9rem;
+  color: var(--ion-color-medium);
+}
+
+@media (max-width: 768px) {
+  .filter-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: stretch;
+  }
+}

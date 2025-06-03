@@ -1,0 +1,493 @@
+// ============================================
+// RANKING FAMOSOS CAROUSEL STYLES
+// ============================================
+
+.ranking-header-card {
+  margin: 16px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  
+  .ranking-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+    
+    .title-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.4rem;
+      font-weight: 700;
+      
+      ion-icon {
+        font-size: 1.6rem;
+      }
+    }
+    
+    .ranking-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+    }
+  }
+}
+
+// ============================================
+// CAROUSEL CONTAINER
+// ============================================
+.carousel-container {
+  margin: 16px;
+  border-radius: 20px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  
+  ion-card-content {
+    padding: 20px;
+  }
+}
+
+// ============================================
+// CAROUSEL CONTROLS
+// ============================================
+.carousel-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 0 10px;
+  
+  .nav-button {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    background: white;
+    
+    &:not([disabled]) {
+      --color: #3880ff;
+      
+      &:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+    }
+    
+    &[disabled] {
+      opacity: 0.3;
+      box-shadow: none;
+    }
+    
+    ion-icon {
+      font-size: 20px;
+    }
+  }
+  
+  // Indicadores de slides
+  .slide-indicators {
+    display: flex;
+    gap: 8px;
+    
+    .indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #e0e0e0;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      
+      &.active {
+        background: #3880ff;
+        transform: scale(1.3);
+      }
+      
+      &:hover:not(.active) {
+        background: #b0b0b0;
+        transform: scale(1.1);
+      }
+    }
+  }
+}
+
+// ============================================
+// CAROUSEL WRAPPER & TRACK
+// ============================================
+.carousel-wrapper {
+  overflow: hidden;
+  border-radius: 16px;
+  
+  .carousel-track {
+    display: flex;
+    gap: 16px;
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    padding: 4px; // Para evitar que se corten las sombras
+  }
+}
+
+// ============================================
+// FAMOSO CARD
+// ============================================
+.famoso-card {
+  flex: 0 0 280px; // Ancho fijo para cada tarjeta
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  position: relative;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+  
+  &.top-three {
+    border: 2px solid #ffd700;
+    box-shadow: 0 4px 16px rgba(255, 215, 0, 0.2);
+    
+    &:hover {
+      box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
+    }
+  }
+  
+  // Efecto ripple
+  ion-ripple-effect {
+    color: rgba(56, 128, 255, 0.1);
+  }
+}
+
+// ============================================
+// CARD HEADER
+// ============================================
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 16px 16px 0;
+  position: relative;
+  z-index: 2;
+  
+  .ranking-position {
+    .position-circle {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      position: relative;
+      
+      &[data-color="warning"] {
+        background: linear-gradient(135deg, #ffd700, #ffed4e);
+      }
+      
+      &[data-color="medium"] {
+        background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
+      }
+      
+      &[data-color="tertiary"] {
+        background: linear-gradient(135deg, #cd7f32, #daa650);
+      }
+      
+      ion-icon {
+        font-size: 18px;
+        margin-bottom: 2px;
+      }
+      
+      .position-number {
+        font-size: 10px;
+        font-weight: 700;
+        color: #333;
+      }
+    }
+  }
+  
+  .visitas-badge {
+    ion-chip {
+      --background: rgba(22, 163, 74, 0.1);
+      --color: #16a34a;
+      border: 1px solid rgba(22, 163, 74, 0.2);
+      font-weight: 600;
+      
+      ion-icon {
+        font-size: 14px;
+      }
+    }
+  }
+}
+
+// ============================================
+// IMAGEN DEL FAMOSO
+// ============================================
+.famoso-image-container {
+  position: relative;
+  height: 200px;
+  margin: 12px 16px 0;
+  border-radius: 16px;
+  overflow: hidden;
+  
+  .famoso-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  
+  .image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      transparent 60%,
+      rgba(0, 0, 0, 0.3) 100%
+    );
+    pointer-events: none;
+  }
+  
+  .favorite-button {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    
+    &:hover {
+      transform: scale(1.1);
+      background: white;
+    }
+    
+    ion-icon {
+      font-size: 20px;
+    }
+    
+    &[color="danger"] {
+      background: rgba(220, 38, 38, 0.1);
+      
+      ion-icon {
+        color: #dc2626;
+      }
+    }
+  }
+}
+
+// ============================================
+// CARD CONTENT
+// ============================================
+.card-content {
+  padding: 16px;
+  
+  .famoso-name {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 12px 0;
+    line-height: 1.3;
+  }
+  
+  .famoso-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+    
+    ion-chip {
+      font-size: 0.8rem;
+      height: 28px;
+      
+      ion-icon {
+        font-size: 14px;
+      }
+    }
+  }
+  
+  .famoso-description {
+    font-size: 0.9rem;
+    color: #666;
+    line-height: 1.4;
+    margin: 0;
+  }
+}
+
+// ============================================
+// SKELETON LOADING
+// ============================================
+.skeleton-card {
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  
+  .card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 12px;
+  }
+}
+
+// ============================================
+// EMPTY STATE
+// ============================================
+.empty-state {
+  padding: 40px 20px !important;
+  
+  ion-icon {
+    font-size: 4rem;
+    margin-bottom: 16px;
+  }
+  
+  h3 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 8px 0;
+  }
+  
+  p {
+    color: #666;
+    margin: 8px 0;
+    line-height: 1.4;
+    
+    &.empty-subtitle {
+      font-size: 0.9rem;
+      color: #999;
+      margin-bottom: 24px;
+    }
+  }
+  
+  ion-button {
+    margin-top: 16px;
+  }
+}
+
+// ============================================
+// ANIMATIONS & TRANSITIONS
+// ============================================
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.famoso-card {
+  animation: slideIn 0.6s ease-out;
+}
+
+// Staggered animation for cards
+.famoso-card:nth-child(1) { animation-delay: 0.1s; }
+.famoso-card:nth-child(2) { animation-delay: 0.2s; }
+.famoso-card:nth-child(3) { animation-delay: 0.3s; }
+
+// ============================================
+// RESPONSIVE DESIGN
+// ============================================
+@media (max-width: 480px) {
+  .famoso-card {
+    flex: 0 0 260px;
+  }
+  
+  .ranking-header-card {
+    margin: 12px;
+    
+    .ranking-title {
+      flex-direction: column;
+      gap: 12px;
+      align-items: flex-start;
+      
+      .title-content {
+        font-size: 1.2rem;
+      }
+    }
+  }
+  
+  .carousel-container {
+    margin: 12px;
+  }
+  
+  .carousel-controls {
+    .nav-button {
+      width: 36px;
+      height: 36px;
+      
+      ion-icon {
+        font-size: 18px;
+      }
+    }
+    
+    .slide-indicators .indicator {
+      width: 6px;
+      height: 6px;
+    }
+  }
+  
+  .card-header .ranking-position .position-circle {
+    width: 44px;
+    height: 44px;
+    
+    ion-icon {
+      font-size: 16px;
+    }
+    
+    .position-number {
+      font-size: 9px;
+    }
+  }
+}
+
+@media (min-width: 768px) {
+  .famoso-card {
+    flex: 0 0 320px;
+    
+    &:hover .famoso-image {
+      transform: scale(1.05);
+    }
+  }
+  
+  .carousel-track {
+    gap: 20px;
+  }
+  
+  .carousel-container {
+    margin: 20px;
+  }
+  
+  .ranking-header-card {
+    margin: 20px;
+  }
+  
+  .carousel-controls .nav-button {
+    width: 44px;
+    height: 44px;
+    
+    ion-icon {
+      font-size: 22px;
+    }
+  }
+}
