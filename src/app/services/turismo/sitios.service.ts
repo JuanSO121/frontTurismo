@@ -112,6 +112,27 @@ export class SitiosService {
     }
   }
 
+    /**
+   * Elimina un sitio específico
+   * @param id ID del sitio a eliminar
+   * @returns Observable con la respuesta del servidor
+   */
+  deleteSitio(id: string): Observable<any> {
+    return this.getAuthHeaders().pipe(
+      switchMap(headers => {
+        const deleteUrl = `${URL_TURISMO}/sitios/eliminar/${id}`;
+        return this.http.delete(deleteUrl, { headers }).pipe(
+          tap(response => console.log('Respuesta de eliminación de sitio:', response)),
+          catchError(this.handleError.bind(this))
+        );
+      }),
+      catchError(error => {
+        console.error(`Error al eliminar sitio con ID ${id}:`, error);
+        return throwError(() => error);
+      })
+    );
+  }
+
   /**
    * Realiza operaciones CRUD sobre sitios
    * @param sitio Datos del sitio

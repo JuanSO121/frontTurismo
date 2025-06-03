@@ -1,76 +1,70 @@
-/* Estilos base del navbar para que coincida con el diseño oscuro de la app */
-.hero-tabs {
-  --background: #1a1f2b;
-  height: 60px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+.modern-tab-bar {
+  --background: #ffffff;
+  --border: none;
+  border-top: 1px solid #f0f0f0;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  height: 65px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
-/* Estilo de los botones de navegación */
-.tab-button {
-  --color: rgba(255, 255, 255, 0.5);
-  --color-selected: #4d92ff;
+.modern-tab-button {
+  --color: #8e8e93;
+  --color-selected: #007aff;
+  --ripple-color: transparent;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
-.tab-button ion-icon {
-  font-size: 24px;
+.modern-tab-button:hover {
+  --color: #007aff;
+  transform: translateY(-1px);
 }
 
-.tab-button ion-label {
-  font-size: 12px;
-  margin-top: 4px;
+.modern-tab-button.tab-selected {
+  --color: #007aff;
 }
 
-/* Estilo especial para la pestaña Héroes */
-.heroes-fab {
-  bottom: 10px;
+.modern-tab-button ion-icon {
+  font-size: 22px;
+  margin-bottom: 2px;
+  transition: all 0.2s ease;
 }
 
-.heroes-fab ion-fab-button {
-  --background: #4d92ff;
-  --background-activated: #3a7de0;
-  --background-hover: #60a0ff;
-  --box-shadow: 0 4px 12px rgba(77, 146, 255, 0.4);
-  --color: white;
-  width: 56px;
-  height: 56px;
-  margin-bottom: 10px;
+.modern-tab-button.tab-selected ion-icon {
+  transform: scale(1.1);
 }
 
-.tab-heroes {
-  position: relative;
+.modern-tab-button ion-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  margin-top: 2px;
 }
 
-.tab-heroes ion-label {
-  position: absolute;
-  bottom: 5px;
-  color: #4d92ff;
-}
-
-.fab-container {
-  height: 46px;
-  position: relative;
-}
-
-/* Aseguramos compatibilidad con safe areas */
-@supports (padding-bottom: env(safe-area-inset-bottom)) {
-  .hero-tabs {
-    padding-bottom: env(safe-area-inset-bottom);
-    height: calc(60px + env(safe-area-inset-bottom));
+/* Tema oscuro */
+@media (prefers-color-scheme: dark) {
+  .modern-tab-bar {
+    --background: #1c1c1e;
+    border-top: 1px solid #2c2c2e;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
   }
   
-  .tab-heroes ion-label {
-    bottom: calc(5px + env(safe-area-inset-bottom)/2);
+  .modern-tab-button {
+    --color: #8e8e93;
+    --color-selected: #0a84ff;
+  }
+  
+  .modern-tab-button:hover {
+    --color: #0a84ff;
+  }
+  
+  .modern-tab-button.tab-selected {
+    --color: #0a84ff;
   }
 }
 
-/* Efecto para tab seleccionado */
-.tab-button.tab-selected {
-  --color-selected: #4d92ff;
-}
-
-/* Ajuste específico para el botón flotante en la pestaña activa */
-.tab-button.tab-selected.tab-heroes .heroes-fab ion-fab-button {
-  --background: #60a0ff;
-  transform: translateY(-5px);
-  transition: transform 0.2s ease;
+/* Animación sutil para transiciones */
+.modern-tab-button::part(native) {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
