@@ -36,7 +36,7 @@ import { IonCard } from '@ionic/angular/standalone';
 import { IonCardHeader, IonCardSubtitle, IonCardTitle } from '@ionic/angular/standalone';
 import { IonCardContent } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { createOutline, trashOutline, personOutline, peopleOutline, locationOutline, close, add, mapOutline } from 'ionicons/icons';
+import { createOutline, trashOutline, personOutline, peopleOutline, locationOutline, close, add, mapOutline, logOutOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-visita',
@@ -107,7 +107,7 @@ export class VisitaPage implements OnInit {
     private authService: AuthService,
     private alertController: AlertController
   ) {
-    addIcons({mapOutline,peopleOutline,personOutline,createOutline,trashOutline,locationOutline,add,close});
+    addIcons({mapOutline,peopleOutline,personOutline,createOutline,trashOutline,locationOutline,add,close,logOutOutline});
   }
 
   async ngOnInit() {
@@ -158,6 +158,18 @@ export class VisitaPage implements OnInit {
       this.router.navigate(['/login']);
     }
   }
+
+  logout() {
+  this.authService.logout().subscribe({
+    next: () => {
+      console.log('Sesión cerrada');
+    },
+    error: (error) => {
+      console.error('Error al cerrar sesión:', error);
+      this.mostrarAlerta('Error', 'No se pudo cerrar sesión correctamente');
+    }
+  });
+}
 
   /**
    * Carga la lista de sitios desde el servicio

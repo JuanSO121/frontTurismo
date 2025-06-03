@@ -27,8 +27,6 @@ import {
   IonList,
   IonThumbnail,
   IonNote,
-  IonFab,
-  IonFabButton,
   AlertController,
   LoadingController,
   ModalController,
@@ -52,15 +50,14 @@ import {
   mapOutline,
   restaurantOutline,
   pricetagOutline,
-  cashOutline,
-  addOutline, shieldCheckmarkOutline, createOutline, constructOutline } from 'ionicons/icons';
+  cashOutline
+} from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { Sitio, Pais, Plato } from 'src/app/interfaces/turismo.interfac';
 import { SitiosService } from 'src/app/services/turismo/sitios.service';
 import { PaisesService } from 'src/app/services/turismo/paises.service';
 import { PlatosService } from 'src/app/services/turismo/platos.service';
 import { FavoriteService } from 'src/app/services/favoritos/favorite.service';
-import { AuthService } from 'src/app/services/autenticacion/auth.service';
 
 @Component({
   selector: 'app-sitios',
@@ -74,8 +71,6 @@ import { AuthService } from 'src/app/services/autenticacion/auth.service';
     IonList,
     IonThumbnail,
     IonNote,
-    IonFab,
-    IonFabButton,
     CommonModule,
     FormsModule,
     IonCard,
@@ -126,10 +121,6 @@ export class SitiosComponent implements OnInit {
   toastMessage: string = '';
   toastColor: string = 'success';
 
-  // Admin properties
-  isAdmin: boolean = false;
-  currentUser: any = null;
-
   // Imágenes
   defaultImage: string = 'assets/img/no-image.png';
 
@@ -138,133 +129,33 @@ export class SitiosComponent implements OnInit {
     private paisesService: PaisesService,
     private platosService: PlatosService,
     private favoriteService: FavoriteService,
-    private authService: AuthService,
     private alertController: AlertController,
     private loadingController: LoadingController,
     private modalController: ModalController,
     private toastController: ToastController
   ) {
-    addIcons({shieldCheckmarkOutline,informationCircleOutline,restaurantOutline,createOutline,trashOutline,businessOutline,locationOutline,mapOutline,addCircleOutline,globeOutline,addOutline,closeOutline,constructOutline,heart,cashOutline,imageOutline,calendarOutline,heartOutline,homeOutline,pricetagOutline});
+    addIcons({
+      addCircleOutline,
+      informationCircleOutline,
+      trashOutline,
+      imageOutline,
+      closeOutline,
+      businessOutline,
+      calendarOutline,
+      heartOutline,
+      heart,
+      locationOutline,
+      globeOutline,
+      homeOutline,
+      mapOutline,
+      restaurantOutline,
+      pricetagOutline,
+      cashOutline
+    });
   }
 
   ngOnInit() {
     this.loadPaises();
-    this.checkAdminStatus();
-  }
-
-  // Verificar si el usuario es administrador
-  async checkAdminStatus() {
-    try {
-      // Obtener el usuario actual del servicio de autenticación
-      this.currentUser = await this.authService.getCurrentUser();
-      
-      if (this.currentUser) {
-        // Verificar si el usuario tiene rol de admin
-        this.isAdmin = this.currentUser.rol === 'admin' || 
-                      this.currentUser.role === 'admin' || 
-                      this.currentUser.is_admin === true ||
-                      this.currentUser.admin === true;
-        
-        console.log('Usuario actual:', this.currentUser);
-        console.log('Es admin:', this.isAdmin);
-      } else {
-        this.isAdmin = false;
-      }
-    } catch (error) {
-      console.error('Error al verificar estado de admin:', error);
-      this.isAdmin = false;
-    }
-  }
-
-  // Método para abrir modal de creación de sitio (solo para admins)
-  async openCreateSitioModal() {
-    if (!this.isAdmin) {
-      this.showToast('No tienes permisos para crear sitios', 'warning');
-      return;
-    }
-
-    const alert = await this.alertController.create({
-      header: 'Crear Nuevo Sitio',
-      message: 'Esta funcionalidad abrirá el formulario de creación de sitios.',
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel'
-        },
-        {
-          text: 'Continuar',
-          handler: () => {
-            // Aquí puedes navegar a una página de creación o abrir un modal más complejo
-            this.showToast('Funcionalidad de creación en desarrollo', 'primary');
-            // Ejemplo: this.router.navigate(['/create-sitio']);
-          }
-        }
-      ]
-    });
-
-    await alert.present();
-  }
-
-  // Método para eliminar sitio (solo para admins)
-  async deleteSitio(sitio: Sitio) {
-    if (!this.isAdmin) {
-      this.showToast('No tienes permisos para eliminar sitios', 'warning');
-      return;
-    }
-
-    const alert = await this.alertController.create({
-      header: 'Confirmar Eliminación',
-      message: `¿Estás seguro de que quieres eliminar el sitio "${sitio.nombre}"?`,
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel'
-        },
-        {
-          text: 'Eliminar',
-          handler: async () => {
-            await this.performDeleteSitio(sitio);
-          }
-        }
-      ]
-    });
-
-    await alert.present();
-  }
-
-  private async performDeleteSitio(sitio: Sitio) {
-    if (!sitio._id) {
-      this.showToast('Error: ID del sitio no válido', 'danger');
-      return;
-    }
-
-    const loading = await this.presentLoading('Eliminando sitio...');
-
-    try {
-      this.sitiosService.deleteSitio(sitio._id).subscribe({
-        next: (response) => {
-          if (response && response.ok) {
-            this.showToast('Sitio eliminado correctamente', 'success');
-            // Recargar sitios del país actual
-            if (this.selectedPais) {
-              this.loadSitiosByPais(this.selectedPais.nombre);
-            }
-          } else {
-            this.showToast('Error al eliminar el sitio', 'danger');
-          }
-          loading.dismiss();
-        },
-        error: (error) => {
-          console.error('Error al eliminar sitio:', error);
-          this.showToast('Error al eliminar el sitio', 'danger');
-          loading.dismiss();
-        }
-      });
-    } catch (error) {
-      console.error('Error en eliminación de sitio:', error);
-      this.showToast('Error inesperado al eliminar', 'danger');
-      loading.dismiss();
-    }
   }
 
   async loadPaises() {

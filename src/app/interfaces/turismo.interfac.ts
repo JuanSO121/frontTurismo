@@ -57,13 +57,13 @@ export interface Sitio {
 
 export interface Visita {
   _id?: string;
-  famoso_id: string[]; // arreglo de IDs de famosos
+  famoso_id: string[];
   usuario_id: string;
-  sitio_id?: string;
-  fecha: Date | string;
+  sitio_id: string;
+  fecha: Date;
   comentario: string;
   img?: string;
   qr_code?: string;
   coordenadas?: string;
+  usuario_nombre?: string; // Campo adicional para mostrar el nombre
 }
-
